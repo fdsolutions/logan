@@ -16,6 +16,15 @@ go get github.com/fdsolutions/logan
 
 ## Documentation
 
+## Tests
+
+The tool is tested using the BDD framework [Ginkgo](http://onsi.github.io/ginkgo/). 
+There is a rake task that define how to run the testt suite. Use the following command :  
+
+```
+rake logan:test
+```
+
 
 ## Contribution
 
