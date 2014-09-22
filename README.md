@@ -1,13 +1,13 @@
 # go-logan
 
-A command ligne scripts organiser written in Go and design for performance and consistency
+A command ligne scripts organiser written in Go, design for performance and consistency
 
 
 ## LICENCE
 
 The MIT License (MIT)
 
-Copyright (c) 2014, fdsolutions <lionel.firstdeveloper@gmail.com> 
+Copyright (c) 2014, fdsolutions 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
