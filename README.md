@@ -3,7 +3,7 @@
 A command ligne scripts organiser written in Go, design for performance and consistency
 
 
-## LICENCE
+## Licence
 
 The MIT License (MIT)
 
