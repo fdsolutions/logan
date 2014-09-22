@@ -1,0 +1,14 @@
+
+gom 'github.com/daviddengcn/go-colortext'
+
+
+
+group :production do
+
+end
+
+
+group :test do
+    gom 'github.com/onsi/ginkgo/ginkgo'
+    gom 'github.com/onsi/gomega'
+end
