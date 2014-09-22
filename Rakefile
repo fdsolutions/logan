@@ -9,4 +9,5 @@ namespace :logan do
 
   # Add all our tasks here ... 
 
+#  task :default => 'logan:test' 
 end
