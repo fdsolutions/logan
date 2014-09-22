@@ -5,6 +5,10 @@ A command ligne scripts organiser written in Go, design for performance and cons
 
 ## Install
 
+```
+go get github.com/fdsolutions/logan
+```
+
 
 ## Usage
 
