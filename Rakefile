@@ -4,7 +4,7 @@ namespace :logan do
 
   desc "Run all test" 
   task :test do 
-    puts "testing ..."
+    sh "gom test"
   end
 
   # Add all our tasks here ... 
