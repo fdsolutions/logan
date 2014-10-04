@@ -1,5 +1,5 @@
 # Design Doc.
----
+
 
 
 
@@ -7,8 +7,14 @@
 | Version      | Date			| Description  	| Authors         |Status|
 | :---------: | :-------------:| ---------| ----------------|:--:|
 | 1            | 04/10/2014    | Creation 		|@First_developer |<span style="color:orange">draft</span>|
+
+
 <!--| 2            | 04/10/2014    | Creation 		|@First_developer |<span style="color:orange">draft</span>|
 -->
+
+
+## Introduction
+
 
 ## Motivation
 
@@ -19,34 +25,34 @@
 
 
 
-###Configuration
+####Configuration
 
 
-###Use cases
+####Use cases
 
-### Dependencies
+#### Dependencies
 
-###Performance
+####Performance
 
 
 
 ## Implementation
 
 
-### Architecture  
+#### Architecture  
 
 
-### Modules
+#### Modules
 
 
-### Data structures  
+#### Data structures  
 
 
-### Processing  
+#### Processing  
 
 ## Extensibility
 
-###Custom providers
+####Custom providers
 
 
 
