@@ -1,2 +1,2 @@
-package logan
+package main
 
