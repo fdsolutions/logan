@@ -60,8 +60,8 @@ As a result, we got :
 **content:** default<br>
 
 >**requirements:** <br>
->- COMMAND = "create_new_app"<br> 
- - APP_NAME = "sampleApp"
+>COMMAND = "create_new_app"<br> 
+APP_NAME = "sampleApp"
 
 ####Configuration
 
