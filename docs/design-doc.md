@@ -55,14 +55,13 @@ show:help COMMAND="create_new_app" APP_NAME="sampleApp"
 ``` 
 As a result, we got : 
 
->intent: <span style='color:#c0392b'>show</span><br>
-target: <span style='color:#c0392b'>help</span><br>
-content: <span style='color:#c0392b'>default</span><br>
+>**intent:** show<br>
+**target:** help<br>
+**content:** default<br>
 
->requirements: 
-
-> <span style='color:#c0392b'>COMMAND</span> = "create_new_app"<br> 
- <span style='color:#c0392b'>APP_NAME</span> = "sampleApp"
+>**requirements:** <br>
+>- COMMAND = "create_new_app"<br> 
+ - APP_NAME = "sampleApp"
 
 ####Configuration
 
