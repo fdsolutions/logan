@@ -35,9 +35,34 @@ It introduces a simple sementic way of organising scripts. Everyone or every tea
 
 
 ## Overview
+Logan use a simple set of idioms to help organizing your scripts. It should be consider like a helper agent that execute what we want by giving him an order. 
 
+The logan agent knows how to execute **actions**.
 
+##Logan idioms
+That's the list of idioms used in the logan world to help categorizing your tasks in a meaningful way.
 
+####Actions
+Every tasks executed by a logan agent is called a **logan action**. A logan action is composed of a **goal** with a given **requirements**.
+
+```
+<intent>:<target>:[<context>] [<requirement>...]
+``` 
+
+######Exemple : Show a command help by given its name as a requirement
+```
+show:help COMMAND="create_new_app" APP_NAME="sampleApp"
+``` 
+As a result, we got : 
+
+>intent: <span style='color:#c0392b'>show</span><br>
+target: <span style='color:#c0392b'>help</span><br>
+content: <span style='color:#c0392b'>default</span><br>
+
+>requirements: 
+
+> <span style='color:#c0392b'>COMMAND</span> = "create_new_app"<br> 
+ <span style='color:#c0392b'>APP_NAME</span> = "sampleApp"
 
 ####Configuration
 
