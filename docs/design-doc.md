@@ -97,7 +97,7 @@ To execute those tasks, we need to launch the following commands :
 * Ubuntu : `sudo apt-get install <APP_NAME>`<br>
 * CentOS : `sudo yum instal <APP_NAME>`
 
-If we try to use **logan** to manage those two installations, we should use a meanifull action name that best describe the action you want to perform : `install:app`. However, we'll have a conflict when launching that action because, we have no idea on which command should be used  
+If we try to use **logan** to manage those two installations, we should use a meaning full action name that best describe the action you want to perform : `install:app`. However, we'll have a conflict when launching that action because, we have no idea on which command should be used  
 
 
 
