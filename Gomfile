@@ -1,11 +1,5 @@
 
-gom 'github.com/daviddengcn/go-colortext'
-
-
-
-group :production do
-
-end
+gom 'github.com/docopt/docopt-go'
 
 
 group :test do
