@@ -83,7 +83,7 @@ A context set to default means that the action belongs to the default category o
 It's a verb describing the action to you need the logan agent to execute. The intent must stick to the following conventions: 
 
 * It must be an infinitive verb whithout the preposition `'to'` like `'sleep'`, ` 'dance'`, `'show'`
-* It must be contains no space or special caracters other than the underscore '_'. In other words, It must be underscored. 
+* It must be contains no space or special caracters other than the underscore '_'. In other words, It must be underscored. <br>
 ######Eg: 
 >'find-out' (NO)<br> 
 'find_out' (YES)
