@@ -32,6 +32,23 @@ var (
 		},
 	}
 
+	paramsExps = []struct {
+		in       string
+		expected map[string]string
+	}{
+		{"", nil},
+		{"DATABASE_NAME='mysqldb'",
+			map[string]string{"DATABASE_NAME": "mysqldb"},
+		},
+		{"DATABASE_NAME='mysqldb' USER='root' PASSWORD='root'",
+			map[string]string{
+				"DATABASE_NAME": "mysqldb",
+				"USER":          "root",
+				"PASSWORD":      "root",
+			},
+		},
+	}
+
 	agent = &Agent{}
 )
 

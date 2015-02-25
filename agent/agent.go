@@ -64,7 +64,7 @@ func (this *Agent) ParseAction(action string) (Action, error) {
 
 	args, _ := docopt.Parse(USAGE, argv, true, LOGAN_VERSION, false)
 
-	fmt.Println("args: %v", args)
+	fmt.Printf("args: %v\n", args)
 
 	return Action{}, nil
 }
