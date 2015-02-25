@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -13,21 +14,17 @@ import (
 
 // Regex tester : https://regex-golang.appspot.com/assets/html/index.html
 
-type actionExp struct {
-	in       string
-	expected Action
-}
-
 var (
-	emptyParams = make(map[string]string)
-
-	actionExps = []actionExp{
+	actionExps = []struct {
+		in       string
+		expected Action
+	}{
 		{"help",
-			Action{"help", "", "", emptyParams}},
+			Action{"help", "", "", nil}},
 		{"show:help",
-			Action{"show", "help", "", emptyParams}},
+			Action{"show", "help", "", nil}},
 		{"install:pkg:ubuntu",
-			Action{"install", "pkg", "ubuntu", emptyParams}},
+			Action{"install", "pkg", "ubuntu", nil}},
 		{"connect:database:mysql DATABASE_NAME='mysqldb'",
 			Action{"connect", "database", "mysql", map[string]string{
 				"DATABASE_NAME": "mysqldb"},
@@ -38,8 +35,14 @@ var (
 	agent = &Agent{}
 )
 
-func TestParse(t *testing.T) {
+func TestParseAction(t *testing.T) {
 	for _, action := range actionExps {
-
+		var got, _ = agent.ParseAction(action.in)
+		var expected = action.expected
+		if !reflect.DeepEqual(got, expected) {
+			t.Errorf("Parsing fails got<%v> != expected<%v>",
+				got,
+				expected)
+		}
 	}
 }

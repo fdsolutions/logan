@@ -1,6 +1,12 @@
 package agent
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+	"strings"
+
+	docopt "github.com/docopt/docopt-go"
+)
 
 type Agent struct{}
 
@@ -11,7 +17,7 @@ type Action struct {
 	parameters map[string]string
 }
 
-const VERSION = "0.1.0"
+const LOGAN_VERSION = "0.1.0"
 
 const USAGE = `A Command line tool helps to organise our scripts.
 
@@ -42,19 +48,23 @@ Options:
   -s, --sudo    Run the action in sudo mode.
 `
 
+// Tuts about regex : https://github.com/StefanSchroeder/Golang-Regex-Tutorial/blob/master/01-chapter2.markdown
+
+// var r = regexp.MustCompile(`(?:(\w*)='?(\S*)'?)*`)
+// fmt.Println("var %v", r.FindAllStringSubmatch("VER=1.0 DETAIL=NULL DATE=12/12/2015", -1))
+// => var %v [[VER=1.0 VER 1.0] [DETAIL=NULL DETAIL NULL] [DATE=12/12/2015 DATE 12/12/2015]]
+
 var params_regex = regexp.MustCompile(`(\w*)='?(\S*)'?`)
 
-func buildParams(attr_values ...string) (params map[string]string) {
-	params = make(map[string]string)
+// Parse a given action string and
+// returns an action object representing the action string
+func (this *Agent) ParseAction(action string) (Action, error) {
 
-	if len(attr_values) > 0 {
-		for _, attr_val := range attr_values {
-			g := params_regex.FindStringSubmatch(attr_val)
+	var argv = strings.Split(action, " ")
 
-			if len(g) > 2 {
-				params[g[1]] = g[2]
-			}
-		}
-	}
-	return
+	args, _ := docopt.Parse(USAGE, argv, true, LOGAN_VERSION, false)
+
+	fmt.Println("args: %v", args)
+
+	return Action{}, nil
 }
