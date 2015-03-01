@@ -3,13 +3,18 @@ package agent
 import (
 	"fmt"
 	"regexp"
+	//"strconv"
+	"errors"
 	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 )
 
+// Agent is the one which handle logan action
 type Agent struct{}
 
+// Action is a combination of <intent:target:context>
+// and <parameters> if any
 type Action struct {
 	intent     string
 	target     string
@@ -17,9 +22,23 @@ type Action struct {
 	parameters map[string]string
 }
 
-const LOGAN_VERSION = "0.1.0"
+// type ParsingError struct {
+//   Cause string
+//   Expr string
+// }
+// type ParamsParsingError ParsingError
+// type ActionParsingError ParsingError
 
-const USAGE = `A Command line tool helps to organise our scripts.
+// func (e *ParsingError) Error() string {
+//   return e.Cause + ": Failed to parse <" + e.Expr + ">"
+// }
+
+const (
+	// LoganVersion is the version number of logan.
+	// it follows SEMVER convention
+	LoganSemVer = "0.1.0"
+
+	UsageStr = `A Command line tool helps to organise our scripts.
 
 Usage:
   logan [options] <goal> [<parameter>...]
@@ -47,6 +66,7 @@ Options:
   --version     Show version.
   -s, --sudo    Run the action in sudo mode.
 `
+)
 
 // Tuts about regex : https://github.com/StefanSchroeder/Golang-Regex-Tutorial/blob/master/01-chapter2.markdown
 
@@ -54,19 +74,44 @@ Options:
 // fmt.Println("var %v", r.FindAllStringSubmatch("VER=1.0 DETAIL=NULL DATE=12/12/2015", -1))
 // => var %v [[VER=1.0 VER 1.0] [DETAIL=NULL DETAIL NULL] [DATE=12/12/2015 DATE 12/12/2015]]
 
-var params_regex = regexp.MustCompile(`(\w*)='?(\S*)'?`)
+var paramsRegex = regexp.MustCompile(`(?:(\w*)=?'(\S*)?')*`)
 
-// Parse params as strign and returns Map respresenting
+// Errors
+// const (
+
+// )
+
+// ParseParams parses params as strign and returns Map respresenting
 // params as a key, value pairs collection
-func (this *Agent) ParseParams(params string) map[string]string {
-	return nil
+// It return nil if the parsing fails
+//   Ex: ("VER=1.0 DETAIL=NULL DATE=12/12/2015") => map[VER:1.0 DETAIL:NULL DATE:12/12/2015]
+func (a *Agent) ParseParams(in string) (map[string]string, error) {
+	paramsArr := paramsRegex.FindAllStringSubmatch(in, -1)
+	if in == "" || len(paramsArr) < 1 {
+		return nil, errors.New("Invalid params <" + in + ">")
+	}
+	paramsMap := arr2Map(paramsArr)
+
+	return paramsMap, nil
 }
 
-// Parse a given action string and
+// arr2Map is an helper function taht tranform an array of array to a map
+func arr2Map(arr [][]string) map[string]string {
+	paramsMap := make(map[string]string)
+	for _, innerArr := range arr {
+		// Build the param map
+		key := innerArr[1]
+		val := innerArr[2]
+		paramsMap[key] = val
+	}
+	return paramsMap
+}
+
+// ParseAction parses a given action string and
 // returns an action object representing the action string
-func (this *Agent) ParseAction(action string) (Action, error) {
+func (a *Agent) ParseAction(action string) (Action, error) {
 	var argv = strings.Split(action, " ")
-	args, _ := docopt.Parse(USAGE, argv, true, LOGAN_VERSION, false)
+	args, _ := docopt.Parse(UsageStr, argv, true, LoganSemVer, false)
 	fmt.Printf("args: %v\n", args)
 	return Action{}, nil
 }

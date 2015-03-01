@@ -52,7 +52,7 @@ var (
 	agent = &Agent{}
 )
 
-func assert(t *testing.T, msg string, got interface{}, expected interface{}) {
+func assertFail(t *testing.T, msg string, got interface{}, expected interface{}) {
 	t.Errorf(msg+"\nGot : %v \nExpected : %v",
 		got,
 		expected)
@@ -60,11 +60,11 @@ func assert(t *testing.T, msg string, got interface{}, expected interface{}) {
 
 func TestParseParams(t *testing.T) {
 	for _, param := range paramsExps {
-		var got = agent.ParseParams(param.in)
+		var got, _ = agent.ParseParams(param.in)
 		var expected = param.expected
 		if !reflect.DeepEqual(got, expected) {
-			assert(t,
-				"Parsing parameters <"+param.in+"> failed",
+			assertFail(t,
+				"It Fails parsing paramters <"+param.in+">",
 				got,
 				expected)
 		}
@@ -76,7 +76,7 @@ func TestParseAction(t *testing.T) {
 		var got, _ = agent.ParseAction(action.in)
 		var expected = action.expected
 		if !reflect.DeepEqual(got, expected) {
-			assert(t,
+			assertFail(t,
 				"Parsing action <"+action.in+"> failed",
 				got,
 				expected)
