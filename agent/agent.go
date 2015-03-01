@@ -56,15 +56,17 @@ Options:
 
 var params_regex = regexp.MustCompile(`(\w*)='?(\S*)'?`)
 
+// Parse params as strign and returns Map respresenting
+// params as a key, value pairs collection
+func (this *Agent) ParseParams(params string) map[string]string {
+	return nil
+}
+
 // Parse a given action string and
 // returns an action object representing the action string
 func (this *Agent) ParseAction(action string) (Action, error) {
-
 	var argv = strings.Split(action, " ")
-
 	args, _ := docopt.Parse(USAGE, argv, true, LOGAN_VERSION, false)
-
 	fmt.Printf("args: %v\n", args)
-
 	return Action{}, nil
 }
