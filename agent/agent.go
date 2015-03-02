@@ -34,6 +34,7 @@ func NewAction(intent string, target string, context string) *Action {
 	return &Action{intent, target, context, make(map[string]string)}
 }
 
+// SetParams assign params to the action
 func (ac *Action) SetParams(params map[string]string) {
 	ac.Parameters = params
 }
@@ -137,29 +138,29 @@ func arr2Map(arr [][]string) map[string]string {
 	return paramsMap
 }
 
-// ParseAction parses a given action command as a string and
-// returns an action object representing the action string
-func (a *Agent) ParseAction(cmd string) (action Action, e error) {
-	var argv = strings.Split(cmd, " ")
-	args, _ := docopt.Parse(UsageStr, argv, true, LoganSemVer, false)
-
-	// Get the <goal> and split it to get intent, target, ctx values
-	goal, _ := args[availableArgsNames["GOAL"]]
-	intent, target, ctx, partMissing := getGoalParts(goal.(string))
-
+func (a *Agent) buildAction(goal string, paramsArr []string) (action Action, e error) {
+	intent, target, ctx, partMissing := getGoalParts(goal)
 	if partMissing {
 		e = errors.New("<intent> and <target> params are required. They must not be empty")
 	}
 	action = *NewAction(intent, target, ctx)
-
-	// Get action params and join as a string separated by a space
-	paramsArr, _ := args[availableArgsNames["PARAMS"]]
-
-	params := strings.Join(paramsArr.([]string), " ") // Join all parameter string
-	actionParams, _ := a.ParseParams(params)          // No error handling
+	params := strings.Join(paramsArr, " ")   // Join all parameter string
+	actionParams, _ := a.ParseParams(params) // No error handling
 	action.SetParams(actionParams)
 
 	return
+}
+
+// ParseAction parses a given action command as a string and
+// returns an action object representing the action string
+// TODO: Review the casting 'cause it seems not right
+func (a *Agent) ParseAction(cmd string) (action Action, e error) {
+	var argv = strings.Split(cmd, " ")
+	args, _ := docopt.Parse(UsageStr, argv, true, LoganSemVer, false)
+	goal, _ := args[availableArgsNames["GOAL"]]
+	paramsArr, _ := args[availableArgsNames["PARAMS"]]
+
+	return a.buildAction(goal.(string), paramsArr.([]string))
 }
 
 // Return intent, target, context and a boolean isPartMissing.
