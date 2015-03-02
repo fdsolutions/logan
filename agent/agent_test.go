@@ -19,8 +19,10 @@ var (
 		in       string
 		expected Action
 	}{
-		{"help",
-			Action{"help", "", "", nil}},
+		{"start:server",
+			Action{"start", "server", "", nil}},
+		// {"help",
+		// 	Action{"help", "", "", nil}},
 		{"show:help",
 			Action{"show", "help", "", nil}},
 		{"install:pkg:ubuntu",
@@ -77,7 +79,7 @@ func TestParseAction(t *testing.T) {
 		var expected = action.expected
 		if !reflect.DeepEqual(got, expected) {
 			assertFail(t,
-				"Parsing action <"+action.in+"> failed",
+				"It Fails parsing action <"+action.in+">",
 				got,
 				expected)
 		}

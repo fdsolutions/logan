@@ -1,7 +1,7 @@
 package agent
 
 import (
-	"fmt"
+	// "fmt"
 	"regexp"
 	//"strconv"
 	"errors"
@@ -11,15 +11,31 @@ import (
 )
 
 // Agent is the one which handle logan action
-type Agent struct{}
+type Agent struct {
+	Options map[string]interface{}
+}
+
+// NewAgent create a new logan agent
+func NewAgent() *Agent {
+	return &Agent{make(map[string]interface{})}
+}
 
 // Action is a combination of <intent:target:context>
 // and <parameters> if any
 type Action struct {
-	intent     string
-	target     string
-	context    string
-	parameters map[string]string
+	Intent     string
+	Target     string
+	Context    string
+	Parameters map[string]string
+}
+
+// NewAction create a new logan action
+func NewAction(intent string, target string, context string) *Action {
+	return &Action{intent, target, context, make(map[string]string)}
+}
+
+func (ac *Action) SetParams(params map[string]string) {
+	ac.Parameters = params
 }
 
 // type ParsingError struct {
@@ -34,10 +50,11 @@ type Action struct {
 // }
 
 const (
-	// LoganVersion is the version number of logan.
+	// LoganSemVer is the version number of logan.
 	// it follows SEMVER convention
 	LoganSemVer = "0.1.0"
 
+	// UsageStr is logan's help text
 	UsageStr = `A Command line tool helps to organise our scripts.
 
 Usage:
@@ -56,7 +73,7 @@ Arguments
                               Eg: 'windows'
                 Eg: create:file:windows
 
-  <paramater>   Additional parameter we want to pass to our goal.
+  <parameter>   Additional parameter we want to pass to our goal.
                 You can set multiple parameters with space as a separator.
                 By convention, we use UPPERCASE_VAR_NAME='<var_value' ...
                 Eg: FILE_NAME='sample.txt' OWNER='fdsolutions'
@@ -66,6 +83,19 @@ Options:
   --version     Show version.
   -s, --sudo    Run the action in sudo mode.
 `
+)
+
+var (
+	availableOptionNames = map[string]string{
+		"HELP":    "--help",
+		"VERSION": "--version",
+		"SUDO":    "--sudo",
+	}
+
+	availableArgsNames = map[string]string{
+		"GOAL":   "<goal>",
+		"PARAMS": "<parameter>",
+	}
 )
 
 // Tuts about regex : https://github.com/StefanSchroeder/Golang-Regex-Tutorial/blob/master/01-chapter2.markdown
@@ -107,11 +137,49 @@ func arr2Map(arr [][]string) map[string]string {
 	return paramsMap
 }
 
-// ParseAction parses a given action string and
+// ParseAction parses a given action command as a string and
 // returns an action object representing the action string
-func (a *Agent) ParseAction(action string) (Action, error) {
-	var argv = strings.Split(action, " ")
+func (a *Agent) ParseAction(cmd string) (action Action, e error) {
+	var argv = strings.Split(cmd, " ")
 	args, _ := docopt.Parse(UsageStr, argv, true, LoganSemVer, false)
-	fmt.Printf("args: %v\n", args)
-	return Action{}, nil
+
+	// Get the <goal> and split it to get intent, target, ctx values
+	goal, _ := args[availableArgsNames["GOAL"]]
+	intent, target, ctx, partMissing := getGoalParts(goal.(string))
+
+	if partMissing {
+		e = errors.New("<intent> and <target> params are required. They must not be empty")
+	}
+	action = *NewAction(intent, target, ctx)
+
+	// Get action params and join as a string separated by a space
+	paramsArr, _ := args[availableArgsNames["PARAMS"]]
+
+	params := strings.Join(paramsArr.([]string), " ") // Join all parameter string
+	actionParams, _ := a.ParseParams(params)          // No error handling
+	action.SetParams(actionParams)
+
+	return
 }
+
+// Return intent, target, context and a boolean isPartMissing.
+// isPartMissing ensure that the intent and the target are present.
+// When count mismatch we fill the missing value with 'nil'
+func getGoalParts(goal string) (intent string, target string, ctx string, partMissing bool) {
+	parts := strings.SplitN(goal, ":", 3)
+	switch len(parts) {
+	case 1: // We have at list the intent
+		intent, target, ctx, partMissing = parts[0], "", "", true
+	case 2:
+		intent, target, ctx, partMissing = parts[0], parts[1], "", false
+	default:
+		intent, target, ctx, partMissing = parts[0], parts[1], parts[2], false
+	}
+	return
+}
+
+// TODO: parse func =>
+// if !a.isInitialize() { // Agent not initialized
+//   return nil, errors.New(`Agent must intialize first.
+//     Use method 'a.initialize(options)' before a.ParseAction`)
+// }
