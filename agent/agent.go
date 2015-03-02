@@ -138,6 +138,8 @@ func arr2Map(arr [][]string) map[string]string {
 	return paramsMap
 }
 
+// buildAction builds an action from its given goal and params
+// Its returns the built action and an error if any
 func (a *Agent) buildAction(goal string, paramsArr []string) (action Action, e error) {
 	intent, target, ctx, partMissing := getGoalParts(goal)
 	if partMissing {
@@ -151,8 +153,8 @@ func (a *Agent) buildAction(goal string, paramsArr []string) (action Action, e e
 	return
 }
 
-// ParseAction parses a given action command as a string and
-// returns an action object representing the action string
+// ParseAction parses a action command given as a string and
+// returns an action object and an error if something went wrong.
 // TODO: Review the casting 'cause it seems not right
 func (a *Agent) ParseAction(cmd string) (action Action, e error) {
 	var argv = strings.Split(cmd, " ")
