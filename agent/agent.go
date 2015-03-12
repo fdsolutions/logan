@@ -12,7 +12,35 @@ import (
 
 // Agent is the one which handle logan action
 type Agent struct {
-	Options map[string]interface{}
+	Defaults Options
+}
+
+// Options is a generic option type
+type Options map[string]interface{}
+
+// ActionCollection gathered 2 types of values.
+// - v:  A simple map for basic implementation
+// - ch: A channel implementation for concurrency
+type ActionCollection struct {
+	v  map[string]Action // For simple implementation
+	ch <-chan Action
+}
+
+// Output is an abstraction to show output
+type Output interface {
+	Show()
+}
+
+// ActionProcessor is tha abstraction of an action processing flow
+type ActionProcessor interface {
+	ParseParams(params string) (ActionParams, error)
+	ParseAction(actionCmd string) (Action, error)
+	CheckAction(action Action) bool
+	Configure(options Options)
+	LoadActions(paths []string) ActionCollection
+	// CacheActions(c ActionCollection) (bool, error)
+	Lookup(a Action, c ActionCollection) (Action, bool)
+	Perform(a Action) (Output, error)
 }
 
 // NewAgent create a new logan agent
@@ -26,8 +54,11 @@ type Action struct {
 	Intent     string
 	Target     string
 	Context    string
-	Parameters map[string]string
+	Parameters ActionParams
 }
+
+// ActionParams is an alias of type map[string]string
+type ActionParams map[string]string
 
 // NewAction create a new logan action
 func NewAction(intent string, target string, context string) *Action {
@@ -50,62 +81,11 @@ func (ac *Action) SetParams(params map[string]string) {
 //   return e.Cause + ": Failed to parse <" + e.Expr + ">"
 // }
 
-const (
-	// LoganSemVer is the version number of logan.
-	// it follows SEMVER convention
-	LoganSemVer = "0.1.0"
-
-	// UsageStr is logan's help text
-	UsageStr = `A Command line tool helps to organise our scripts.
-
-Usage:
-  logan [options] <goal> [<parameter>...]
-  logan -h | --help
-  logan --version
-
-Arguments
-  <goal>        The goal is expressed as a composition of this 3 items '<intent>:<target>:<context>'
-                - <intent>  : Define the action verb we want to perform.
-                              Eg: 'create'
-                - <target>  : Define the target that we have the intention to
-                              operate on.
-                              Eg: 'file'
-                - <context> : Define the context in which the action is performed.
-                              Eg: 'windows'
-                Eg: create:file:windows
-
-  <parameter>   Additional parameter we want to pass to our goal.
-                You can set multiple parameters with space as a separator.
-                By convention, we use UPPERCASE_VAR_NAME='<var_value' ...
-                Eg: FILE_NAME='sample.txt' OWNER='fdsolutions'
-
-Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  -s, --sudo    Run the action in sudo mode.
-`
-)
-
-var (
-	availableOptionNames = map[string]string{
-		"HELP":    "--help",
-		"VERSION": "--version",
-		"SUDO":    "--sudo",
-	}
-
-	availableArgsNames = map[string]string{
-		"GOAL":   "<goal>",
-		"PARAMS": "<parameter>",
-	}
-)
-
 // Tuts about regex : https://github.com/StefanSchroeder/Golang-Regex-Tutorial/blob/master/01-chapter2.markdown
 
 // var r = regexp.MustCompile(`(?:(\w*)='?(\S*)'?)*`)
 // fmt.Println("var %v", r.FindAllStringSubmatch("VER=1.0 DETAIL=NULL DATE=12/12/2015", -1))
 // => var %v [[VER=1.0 VER 1.0] [DETAIL=NULL DETAIL NULL] [DATE=12/12/2015 DATE 12/12/2015]]
-
-var paramsRegex = regexp.MustCompile(`(?:(\w*)=?'(\S*)?')*`)
 
 // Errors
 // const (
@@ -126,7 +106,7 @@ func (a *Agent) ParseParams(in string) (map[string]string, error) {
 	return paramsMap, nil
 }
 
-// arr2Map is an helper function taht tranform an array of array to a map
+// arr2Map is an helper function that tranform an array of array to a map
 func arr2Map(arr [][]string) map[string]string {
 	paramsMap := make(map[string]string)
 	for _, innerArr := range arr {
@@ -180,9 +160,3 @@ func getGoalParts(goal string) (intent string, target string, ctx string, partMi
 	}
 	return
 }
-
-// TODO: parse func =>
-// if !a.isInitialize() { // Agent not initialized
-//   return nil, errors.New(`Agent must intialize first.
-//     Use method 'a.initialize(options)' before a.ParseAction`)
-// }
