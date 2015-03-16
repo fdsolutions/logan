@@ -10,7 +10,7 @@ import (
 // Regex tester : https://regex-golang.appspot.com/assets/html/index.html
 
 var (
-	cliExprs = []struct {
+	cmdInputs = []struct {
 		in       string
 		expected Argv
 	}{
@@ -41,16 +41,12 @@ var (
 )
 
 var _ = Describe("Parser", func() {
-	var parser *ParserImp
+	var parser *ParserImp = NewParser()
 
-	BeforeEach(func() {
-		parser = NewParser()
-	})
-
-	It("should parse CLI expressions", func() {
-		for _, cliExpr := range cliExprs {
-			var got, _ = parser.ParseExpr(cliExpr.in)
-			var expected = cliExpr.expected
+	It("should parse CLI inputs", func() {
+		for _, cmd := range cmdInputs {
+			var got, _ = parser.ParseUserInput(cmd.in)
+			var expected = cmd.expected
 			Expect(got).To(Equal(expected))
 		}
 	})
