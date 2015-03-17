@@ -4,12 +4,6 @@ import (
 	log "github.com/fdsolutions/logan/log"
 )
 
-func fieldify(input string) map[string]string {
-	return map[string]string{
-		"inputCmd": input,
-	}
-}
-
 func I(msg string, input string) {
 	log.Info(msg, fieldify(input))
 }
@@ -24,4 +18,22 @@ func W(msg string, input string) {
 
 func E(msg string, input string) {
 	log.Error(msg, fieldify(input))
+}
+
+func fieldify(input string) map[string]string {
+	return map[string]string{
+		"inputCmd": input,
+	}
+}
+
+// arr2Map is an helper function that tranform an array of array to a map
+func ArrayToMap(arr [][]string) map[string]string {
+	m := make(map[string]string)
+	for _, innerArr := range arr {
+		// Build the param map
+		key := innerArr[1]
+		val := innerArr[2]
+		m[key] = val
+	}
+	return m
 }
