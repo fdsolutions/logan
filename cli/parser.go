@@ -14,7 +14,7 @@ import (
 const (
 	paramsRegexPattern = `(?:(\w*)='?([^']*)'?)*`
 
-	// UsageStr is logan's help text
+	// Usage is logan's help text
 	Usage = `A Command line tool helps to organise our scripts.
 
 Usage:
@@ -71,6 +71,7 @@ type ParserError struct {
 	input string
 }
 
+// NewError create parser error for a specific code
 func NewError(code ErrorCode, input string) *ParserError {
 	return &ParserError{code, input}
 }
@@ -90,7 +91,7 @@ func NewParser() *ParserImp {
 	return FromParamsRegexPattern(paramsRegexPattern)
 }
 
-// FromRegexPattern return a parser using the given regex pattern
+// FromParamsRegexPattern returns a parser using the given regex pattern
 func FromParamsRegexPattern(pattern string) *ParserImp {
 	return &ParserImp{regexp.MustCompile(pattern)}
 }
