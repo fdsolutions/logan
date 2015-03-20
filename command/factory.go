@@ -17,21 +17,11 @@ func (e *FactoryError) Error() string {
 	return fmt.Sprintf("%s : expr=<%v>", e.code, e.expr)
 }
 
-type Repository interface {
-	findCmdByName(name string) (Metadata, error)
-}
-
-type Repositories []Repository
-
 type Factory interface {
-	getCommandByName(name string) Command
-	getCommandByMetadata(meta Metadata) Command
+	MakeFromName(name string) *CommandImp
+	MakeFromMetadata(meta Metadata) *CommandImp
 }
 
-type FactoryImp struct {
-	repos Repositories
-}
-
-func New(repos Repositories) (factory *FactoryImp) {
-	return &FactoryImp{repos}
+func New() (factory *FactoryImp) {
+	return new(FactoryImp)
 }
