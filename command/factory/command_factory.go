@@ -1,4 +1,4 @@
-package command
+package factory
 
 import (
 	"fmt"
@@ -18,10 +18,14 @@ func (e *FactoryError) Error() string {
 }
 
 type Factory interface {
-	MakeFromName(name string) *CommandImp
-	MakeFromMetadata(meta Metadata) *CommandImp
+	MakeFromName(name string) *Command
+	MakeFromMetadata(meta Metadata) *Command
 }
 
-func New() (factory *FactoryImp) {
+func NewFactory() (factory *FactoryImp) {
 	return new(FactoryImp)
+}
+
+func MakeFromName(name string) Command {
+	return NewCommand(name)
 }

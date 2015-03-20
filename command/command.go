@@ -1,29 +1,27 @@
 package command
 
-import ()
+import (
+	"github.com/fdsolutions/logan/command/metadata"
+)
 
-type Expr string
+const (
+	commandNamePartSeparator string = ":"
+	cumberOfCommandNameParts        = "3"
+)
 
-type Arguments map[string]string
-
-
+// Command is the base interface implemented by all commands
 type Command interface {
 	Metadata() Metadata
-	GetArgs() Arguments
-	Run()
+	Run() error
 }
 
-type commandImp struct {
+// Imp is a concrete command object
+type Imp struct {
 	meta Metadata
-	args Arguments
-	extras Arguments
 }
 
-
-func New(name string, args Arguments) (*CommandImp) {
-	return &CommandImp{
-		name
-	}
+// New is the command construtor
+func New(name string) *Imp {
+	meta := metadata.New()
+	return &Imp{}
 }
-
-
