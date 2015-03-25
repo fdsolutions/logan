@@ -13,12 +13,12 @@ type Factory interface {
 	MakeCommandFromMetadata(meta Metadata) Command
 }
 
-type CommandFactory struct{}
+type ConcreteFactory struct{}
 
-func NewFactory() (factory *CommandFactory) {
-	return new(CommandFactory)
+func NewFactory() (factory *ConcreteFactory) {
+	return new(ConcreteFactory)
 }
 
-func (cf *CommandFactory) MakeCommandFromName(name string) Command {
+func (cf *ConcreteFactory) MakeCommandFromName(name string) Command {
 	return NewCommandFromName(name)
 }

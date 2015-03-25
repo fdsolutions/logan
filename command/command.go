@@ -6,7 +6,7 @@ import (
 
 const (
 	commandNamePartSeparator string = ":"
-	numberOfCommandNameParts        = "3"
+	numberOfCommandNameParts int    = 3
 	noPartValue                     = ""
 
 	InvalidCommand errors.ErrorCode = "Invalid command"
