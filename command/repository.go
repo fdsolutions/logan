@@ -1,9 +1,5 @@
 package command
 
-import (
-	"github.com/fdsolutions/logan/command/metadata"
-)
-
 // RepositoryReader defines reading operations.
 type RepositoryReader interface {
 	Query(cond map[string]string) []Metadata
