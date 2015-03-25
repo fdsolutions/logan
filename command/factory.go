@@ -9,8 +9,7 @@ const (
 )
 
 type Factory interface {
-	MakeCommandFromName(name string) Command
-	MakeCommandFromMetadata(meta Metadata) Command
+	MakeCommandFromMetatdata(meta *Metadata) Command
 }
 
 type ConcreteFactory struct{}
@@ -19,6 +18,9 @@ func NewFactory() (factory *ConcreteFactory) {
 	return new(ConcreteFactory)
 }
 
-func (cf *ConcreteFactory) MakeCommandFromName(name string) Command {
-	return NewCommandFromName(name)
+// MakeCommandFromMetatdata creates a new command with the given metadata.
+func (cf *ConcreteFactory) MakeCommandFromMetatdata(meta *Metadata) (c Command) {
+	c = NewCommand()
+	c.SetMetadata(meta)
+	return
 }

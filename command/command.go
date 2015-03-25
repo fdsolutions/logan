@@ -14,24 +14,28 @@ const (
 
 // Command is the base interface implemented by all commands
 type Command interface {
-	Metadata() Metadata
+	GetMetadata() *Metadata
+	SetMetadata(meta *Metadata)
 	Run() error
 }
 
-// Imp is a concrete command object
+// ConcreteCommand is a concrete command
 type ConcreteCommand struct {
-	meta Metadata
+	meta *Metadata
 }
 
-// New is the command construtor
-func NewCommandFromName(name string) *ConcreteCommand {
-	meta := NewMetadataFromName(name)
-	return &ConcreteCommand{meta}
+func NewCommand() *ConcreteCommand {
+	return &ConcreteCommand{}
 }
 
 // Metadata is the getter for meta attribute of the command
-func (c *ConcreteCommand) Metadata() Metadata {
+func (c *ConcreteCommand) GetMetadata() *Metadata {
 	return c.meta
+}
+
+// Metadata is the getter for meta attribute of the command
+func (c *ConcreteCommand) SetMetadata(meta *Metadata) {
+	c.meta = meta
 }
 
 func (c *ConcreteCommand) Run() error {
