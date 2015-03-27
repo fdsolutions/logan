@@ -40,7 +40,7 @@ var (
 	}
 )
 
-var _ = Describe("Args", func() {
+var _ = Describe("args", func() {
 
 	It("should parse user inputs", func() {
 		for _, input := range userInputExamples {

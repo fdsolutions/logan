@@ -15,8 +15,8 @@ import (
 const (
 	argsParamsRegexPattern = `(?:(\w*)='?([^']*)'?)*`
 
-	InvalidInput  errors.ErrorCode = "Invalid input."
-	InvalidParams errors.ErrorCode = "Invalid params : No params retreived from user input."
+	ErrInvalidInput  errors.ErrorCode = "Invalid input."
+	ErrInvalidParams errors.ErrorCode = "Invalid params : No params retreived from user input."
 )
 
 var (
@@ -40,7 +40,7 @@ func ArgsFromInput(input string) (args Args, e error) {
 
 	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false)
 	if err != nil {
-		e = errors.New(InvalidInput)
+		e = errors.New(ErrInvalidInput)
 		return
 	}
 	args = extractArgsElementsFrom(parsedArgs)
@@ -78,7 +78,7 @@ func extractParamsFrom(args map[string]interface{}) (map[string]string, error) {
 func makeParamsFromList(paramList []string) (map[string]string, error) {
 	params, ok := scanParamList(paramList)
 	if !ok {
-		return nil, errors.New(InvalidParams)
+		return nil, errors.New(ErrInvalidParams)
 	}
 	return helpers.ArrayToMap(params), nil
 }
@@ -87,9 +87,14 @@ func scanParamList(paramList []string) ([][]string, bool) {
 	if len(paramList) < 1 {
 		return nil, false
 	}
+	inlineParamList := strings.Join(paramList, " ")
 	paramParser := Parser(ArgsParamParser{})
-	paramListAsInputText := strings.Join(paramList, " ")
-	return paramParser.Parse(paramListAsInputText), true
+	parsedParams := paramParser.Parse(inlineParamList)
+	if pp, ok := parsedParams.([][]string); !ok {
+		return nil, false
+	} else {
+		return pp, true
+	}
 }
 
 // ArgsParamParser is used to parse arg parameters.
@@ -99,7 +104,8 @@ type ArgsParamParser struct {
 }
 
 // Parse define the way arg parameters must be parsed
-func (a ArgsParamParser) Parse(input string) [][]string {
+func (a ArgsParamParser) Parse(input string) (params interface{}) {
 	r := regexp.MustCompile(argsParamsRegexPattern)
-	return r.FindAllStringSubmatch(input, -1)
+	params = r.FindAllStringSubmatch(input, -1)
+	return
 }

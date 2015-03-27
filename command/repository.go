@@ -1,6 +1,7 @@
 package command
 
-// Repository is a common interface for all repos
+// Repository is the interface that every repository
+// must implement
 type Repository interface {
 	FindCommandByName(string) (Command, error)
 }

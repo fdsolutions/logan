@@ -7,21 +7,21 @@ import (
 const (
 	commandNamePartSeparator string = ":"
 	numberOfCommandNameParts int    = 3
-	noPartValue                     = ""
+	noPartValue              string = ""
 
-	InvalidCommand errors.ErrorCode = "Invalid command"
+	ErrInvalidCommand errors.ErrorCode = "Invalid command"
 )
 
 // Command is the base interface implemented by all commands
 type Command interface {
-	GetMetadata() *Metadata
-	SetMetadata(meta *Metadata)
+	GetMetadata() Metadata
+	SetMetadata(meta Metadata)
 	Run() error
 }
 
 // ConcreteCommand is a concrete command
 type ConcreteCommand struct {
-	meta *Metadata
+	meta Metadata
 }
 
 func NewCommand() *ConcreteCommand {
@@ -29,15 +29,15 @@ func NewCommand() *ConcreteCommand {
 }
 
 // Metadata is the getter for meta attribute of the command
-func (c *ConcreteCommand) GetMetadata() *Metadata {
+func (c *ConcreteCommand) GetMetadata() Metadata {
 	return c.meta
 }
 
 // Metadata is the getter for meta attribute of the command
-func (c *ConcreteCommand) SetMetadata(meta *Metadata) {
+func (c *ConcreteCommand) SetMetadata(meta Metadata) {
 	c.meta = meta
 }
 
 func (c *ConcreteCommand) Run() error {
-	return errors.New(InvalidCommand)
+	return errors.New(ErrInvalidCommand)
 }

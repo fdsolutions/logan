@@ -1,7 +1,20 @@
 package command
 
+import (
+	"strings"
+
+	errors "github.com/fdsolutions/logan/errors"
+)
+
+const (
+	ErrConflictingCommandFound errors.ErrorCode = `Command conflict : 
+at least two command found for the same name`
+	ErrInvalidFilePath errors.ErrorCode = "Invalid store source file path"
+)
+
 // Metadata holds command specification
 type Metadata struct {
+	Name    string
 	Intent  string
 	Target  string
 	Context string
@@ -16,12 +29,8 @@ func NewMetadataFromName(name string) Metadata {
 // New create a metadata object from its properties (intent, target, context).
 // Make sure parameters are in the right order.
 func NewMetadata(intent string, target string, context string) Metadata {
-	return Metadata{intent, target, context}
-}
-
-// MetadataStore defines abstract operations to implement for a metadata store
-type MetadataStore interface {
-	GetByName(name string) *Metadata
+	name := strings.Join([]string{intent, target, context}, commandNamePartSeparator)
+	return Metadata{name, intent, target, context}
 }
 
 // MetadataRepository is a repository used to find command metadata
@@ -46,12 +55,21 @@ func NewFromStoreAndFactory(s MetadataStore, f Factory) Repository {
 
 // FindCommandByName looks for command metadata in the repository by the given name and
 // create a new command instance from the metadata found.
-func (r *MetadataRepository) FindCommandByName(name string) (Command, error) {
-	var s MetadataStore = r.GetMetadataStore()
-	var f Factory = r.GetFactory()
+func (r *MetadataRepository) FindCommandByName(name string) (c Command, err error) {
+	s := r.GetMetadataStore()
+	f := r.GetFactory()
+
 	// Get metadata related to the command name
-	meta := s.GetByName(name)
+	meta, err := s.FindByName(name)
+	if err != nil {
+		return
+	}
 	return f.MakeCommandFromMetatdata(meta), nil
+}
+
+// GetStore returns the metadata store of the repository
+func (r *MetadataRepository) GetMetadataStore() MetadataStore {
+	return r.store
 }
 
 // GetFactory is used as a getter for factory property of repository
@@ -59,7 +77,28 @@ func (r *MetadataRepository) GetFactory() Factory {
 	return r.factory
 }
 
-// GetStore returns the metadata store of the repository
-func (r *MetadataRepository) GetMetadataStore() MetadataStore {
-	return r.store
+// MetadataStore defines abstract operations to implement for a metadata store
+type MetadataStore interface {
+	FindByName(name string) (Metadata, error)
+	FindByIntent(intent string) []Metadata
+	FindByTarget(target string) []Metadata
+	FindByContext(ctx string) []Metadata
+}
+
+// FileMetadataStore is a metadata store using file as a data source
+type FileMetadataStore struct {
+	FilePath string
+}
+
+func NewFileMetadataStore(path string) (fs *FileMetadataStore, err error) {
+	if path == "" {
+		err = errors.New(ErrInvalidFilePath)
+		return
+	}
+	fs = &FileMetadataStore{path}
+	return
+}
+
+func (fs *FileMetadataStore) FindByName(name string) (meta Metadata, err error) {
+	return
 }

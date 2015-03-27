@@ -1,15 +1,7 @@
 package command
 
-import (
-	errors "github.com/fdsolutions/logan/errors"
-)
-
-const (
-	InvalidCommandName errors.ErrorCode = "Invalid command name"
-)
-
 type Factory interface {
-	MakeCommandFromMetatdata(meta *Metadata) Command
+	MakeCommandFromMetatdata(meta Metadata) Command
 }
 
 type ConcreteFactory struct{}
@@ -19,7 +11,7 @@ func NewFactory() (factory *ConcreteFactory) {
 }
 
 // MakeCommandFromMetatdata creates a new command with the given metadata.
-func (cf *ConcreteFactory) MakeCommandFromMetatdata(meta *Metadata) (c Command) {
+func (cf *ConcreteFactory) MakeCommandFromMetatdata(meta Metadata) (c Command) {
 	c = NewCommand()
 	c.SetMetadata(meta)
 	return
