@@ -1,36 +1,54 @@
 package command
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"strings"
 
 	errors "github.com/fdsolutions/logan/errors"
+	helpers "github.com/fdsolutions/logan/helpers"
 )
 
 const (
 	ErrConflictingCommandFound errors.ErrorCode = `Command conflict : 
 at least two command found for the same name`
-	ErrInvalidFilePath errors.ErrorCode = "Invalid store source file path"
+	ErrInvalidFilePath       errors.ErrorCode = "Invalid store source file path"
+	ErrUnsupportedFileFormat errors.ErrorCode = "Unsupported file format: can't load data from store file"
 )
 
 // Metadata holds command specification
 type Metadata struct {
-	Name    string
-	Intent  string
-	Target  string
-	Context string
+	Name           string   `json:"name"`
+	Intent         string   `json:"intent"`
+	Target         string   `json:"target"`
+	Context        string   `json:"context"`
+	Path           string   `json:"path"`
+	RequiredParams []string `json:"required_params"`
 }
 
 // NewMetadataFromName instanciate a new metadata from command name
-func NewMetadataFromName(name string) Metadata {
+func NewMetadataFromName(name string) *Metadata {
 	intent, target, ctx := GetCommandNameParts(name)
-	return NewMetadata(intent, target, ctx)
+	return NewMetadataFromGoal(intent, target, ctx)
 }
 
-// New create a metadata object from its properties (intent, target, context).
+// New create a metadata object from its goal.
+// A goal is compose of (intent, target, context).
 // Make sure parameters are in the right order.
-func NewMetadata(intent string, target string, context string) Metadata {
+func NewMetadataFromGoal(intent string, target string, context string) *Metadata {
+	var m *Metadata
 	name := strings.Join([]string{intent, target, context}, commandNamePartSeparator)
-	return Metadata{name, intent, target, context}
+	m = NewMetadata()
+	m.Name = name
+	m.Intent = intent
+	m.Target = target
+	m.Context = context
+	return m
+}
+
+func NewMetadata() *Metadata {
+	return &Metadata{}
 }
 
 // MetadataRepository is a repository used to find command metadata
@@ -80,25 +98,56 @@ func (r *MetadataRepository) GetFactory() Factory {
 // MetadataStore defines abstract operations to implement for a metadata store
 type MetadataStore interface {
 	FindByName(name string) (Metadata, error)
-	FindByIntent(intent string) []Metadata
-	FindByTarget(target string) []Metadata
-	FindByContext(ctx string) []Metadata
+	FindAll() []Metadata
+	// FindByIntent(intent string) []Metadata
+	// FindByTarget(target string) []Metadata
+	// FindByContext(ctx string) []Metadata
+	Filepath() string
 }
 
 // FileMetadataStore is a metadata store using file as a data source
 type FileMetadataStore struct {
-	FilePath string
+	filePath string
+	data     []Metadata
 }
 
+// NewFileMetadataStore returns an instance of a FileMetadataStore
 func NewFileMetadataStore(path string) (fs *FileMetadataStore, err error) {
-	if path == "" {
+	if path == "" || helpers.FileDoesntExist(path) {
 		err = errors.New(ErrInvalidFilePath)
 		return
 	}
-	fs = &FileMetadataStore{path}
+	fs = &FileMetadataStore{path, nil}
 	return
 }
 
-func (fs *FileMetadataStore) FindByName(name string) (meta Metadata, err error) {
+// Filepath returns a source file path of the metadata store
+func (fs *FileMetadataStore) Filepath() string {
+	return fs.filePath
+}
+
+// FindAll returns all metadata contains in the store
+// It returns an error as a second return value if something bad happens,
+// this to enable error handling
+func (fs *FileMetadataStore) FindAll() (metas []Metadata, err error) {
+	err = fs.load()
+	metas = fs.data
+	return
+}
+
+func (fs *FileMetadataStore) load() (err error) {
+	jsonContentAsBytes, _ := ioutil.ReadFile(fs.filePath)
+	err = fs.loadFromJSON(jsonContentAsBytes)
+	return
+}
+
+func (fs *FileMetadataStore) loadFromJSON(content []byte) (err error) {
+	var metas []Metadata
+	err = json.Unmarshal(content, &metas)
+	helpers.W("loadFromJSON: ", fmt.Sprintf("%v, err: %v", metas, err))
+	if err != nil {
+		return errors.New(ErrUnsupportedFileFormat)
+	}
+	fs.data = metas
 	return
 }
