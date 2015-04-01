@@ -112,25 +112,25 @@ type Repository interface {
 	GetStore() Store
 }
 
-// RepositoryImpl is a repository used to find command metadata
+// repositoryImpl is a repository used to find command metadata
 // It has its own store.
-type RepositoryImpl struct {
+type repositoryImpl struct {
 	store Store
 }
 
 // NewRepository returns a new repository
-func NewRepository() *RepositoryImpl {
-	return &RepositoryImpl{}
+func NewRepository() *repositoryImpl {
+	return &repositoryImpl{}
 }
 
 // NewFromStore returns a new repository and set its store at the same time.
-func NewFromStore(s Store) *RepositoryImpl {
+func NewRepositoryFromStore(s Store) *repositoryImpl {
 	repo := NewRepository()
 	repo.store = s
 	return repo
 }
 
 // GetStore returns the metadata store of the repository
-func (r *RepositoryImpl) GetStore() Store {
+func (r *repositoryImpl) GetStore() Store {
 	return r.store
 }
