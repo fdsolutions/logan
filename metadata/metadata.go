@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	errors "github.com/fdsolutions/logan/errors"
-	helpers "github.com/fdsolutions/logan/helpers"
+	helper "github.com/fdsolutions/logan/helper"
 )
 
 const (
@@ -113,7 +113,7 @@ type FileMetadataStore struct {
 
 // NewFileMetadataStore returns an instance of a FileMetadataStore
 func NewFileMetadataStore(path string) (fs *FileMetadataStore, err error) {
-	if path == "" || helpers.FileDoesntExist(path) {
+	if path == "" || helper.FileDoesntExist(path) {
 		err = errors.New(ErrInvalidFilePath)
 		return
 	}
@@ -144,7 +144,7 @@ func (fs *FileMetadataStore) load() (err error) {
 func (fs *FileMetadataStore) loadFromJSON(content []byte) (err error) {
 	var metas []Metadata
 	err = json.Unmarshal(content, &metas)
-	helpers.W("loadFromJSON: ", fmt.Sprintf("%v, err: %v", metas, err))
+	helper.W("loadFromJSON: ", fmt.Sprintf("%v, err: %v", metas, err))
 	if err != nil {
 		return errors.New(ErrUnsupportedFileFormat)
 	}

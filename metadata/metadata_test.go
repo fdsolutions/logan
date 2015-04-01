@@ -64,6 +64,7 @@ var _ = Describe("metadata", func() {
 				})
 			})
 			Context("With a file containing metadata in JSON format", func() {
+				// TODO : Make the choice of element random in asserion 'containElement'
 				It("should return all metadata from store file", func() {
 					metas, _ := store.FindAll()
 					expectedMetadata := NewMetadata()
