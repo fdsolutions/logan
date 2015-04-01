@@ -78,6 +78,28 @@ var _ = Describe("metadata", func() {
 				})
 			})
 		})
+
+		Describe("#Query", func() {
+			Context("With no predicate", func() {
+				It("should query all entries", func() {
+					entries := store.Query(nil)
+					Expect(entries).ToNot(BeEmpty())
+				})
+			})
+
+			Context("Entries of a given goal name", func() {
+				It("should get all entries of that goal name", func() {
+					goalName := "show:version"
+					entries := store.Query(func(ent Entry) bool {
+						return (ent.Goal == goalName)
+					})
+					expEntry := NewEntry()
+					expEntry.Goal = "show:version"
+					expEntry.Target = "version"
+					Expect(entries).To(ContainElement(*expEntry))
+				})
+			})
+		})
 	})
 
 })

@@ -59,6 +59,7 @@ func NewFromGoalParts(intent string, target string, context string) *Entry {
 type Store interface {
 	Filepath() string
 	QueryAll() []Entry
+	Query(cond func(Entry) bool) []Entry
 }
 
 // FileStore is a metadata store using file as a data source
@@ -82,12 +83,21 @@ func (fs *FileStore) Filepath() string {
 	return fs.filePath
 }
 
+// Query tries to find metadata entries that match the given predicace
+func (fs *FileStore) Query(cond func(Entry) bool) []Entry {
+	entries, _ := fs.QueryAll()
+	if cond == nil {
+		return entries
+	}
+	return filterEntries(entries, cond)
+}
+
 // QueryAll returns all metadata contains in the store
 // It returns an error as a second return value if something bad happens,
 // this to enable error handling
-func (fs *FileStore) QueryAll() (metas []Entry, err error) {
+func (fs *FileStore) QueryAll() (entries []Entry, err error) {
 	err = fs.load()
-	metas = fs.data
+	entries = fs.data
 	return
 }
 
@@ -105,6 +115,16 @@ func (fs *FileStore) loadFromJSON(content []byte) (err error) {
 	}
 	fs.data = metas
 	return
+}
+
+func filterEntries(entries []Entry, cond func(Entry) bool) []Entry {
+	selectedEntries := []Entry{}
+	for _, entry := range entries {
+		if ok := cond(entry); ok {
+			selectedEntries = append(selectedEntries, entry)
+		}
+	}
+	return selectedEntries
 }
 
 // Repository is a set of methods that a metadata repository must implement
