@@ -1,4 +1,4 @@
-package helpers
+package helper
 
 import (
 	log "github.com/fdsolutions/logan/log"
