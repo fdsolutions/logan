@@ -1,18 +1,18 @@
 [
 	{
-		"name": "show:version",
+		"goal": "show:version",
 		"target": "version"
 	},
 	{
-		"name": "show:help"
+		"goal": "show:help"
 	},
 	{
-		"name": "show:help:unix",
+		"goal": "show:help:unix",
 		"path": "/usr/bin/man <CMD_NAME>",
 		"required_params": ["<CMD_NAME>"]
 	},
 	{
-		"name": "copy:file:unix",
+		"goal": "copy:file:unix",
 		"path": "/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>",
 		"required_params": ["<SOURCE_FILE>", "<DESTINATION_FILE>"]
 	}

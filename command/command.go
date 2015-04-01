@@ -2,42 +2,40 @@ package command
 
 import (
 	"github.com/fdsolutions/logan/errors"
+	"github.com/fdsolutions/logan/metadata"
 )
 
 const (
-	commandNamePartSeparator string = ":"
-	numberOfCommandNameParts int    = 3
-	noPartValue              string = ""
-
 	ErrInvalidCommand errors.ErrorCode = "Invalid command"
 )
 
 // Command is the base interface implemented by all commands
 type Command interface {
-	GetMetadata() Metadata
-	SetMetadata(meta Metadata)
+	GetMetadata() metadata.Entry
+	SetMetadata(meta metadata.Entry)
 	Run() error
 }
 
 // ConcreteCommand is a concrete command
-type ConcreteCommand struct {
-	meta Metadata
+type Entry struct {
+	meta metadata.Entry
 }
 
-func NewCommand() *ConcreteCommand {
-	return &ConcreteCommand{}
+func NewEntry() *Entry {
+	return &Entry{}
 }
 
-// Metadata is the getter for meta attribute of the command
-func (c *ConcreteCommand) GetMetadata() Metadata {
+// GetMetadata is the getter for meta attribute of the command
+func (c *Entry) GetMetadata() metadata.Entry {
 	return c.meta
 }
 
-// Metadata is the getter for meta attribute of the command
-func (c *ConcreteCommand) SetMetadata(meta Metadata) {
+// SetMetadata is the getter for meta attribute of the command
+func (c *Entry) SetMetadata(meta metadata.Entry) {
 	c.meta = meta
 }
 
-func (c *ConcreteCommand) Run() error {
+// Run executes the command
+func (c *Entry) Run() error {
 	return errors.New(ErrInvalidCommand)
 }

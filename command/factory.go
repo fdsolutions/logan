@@ -1,18 +1,19 @@
 package command
 
+// Factory is compose of a set of methods to create commands
 type Factory interface {
-	MakeCommandFromMetatdata(meta Metadata) Command
+	MakeCommand() Command
 }
 
-type ConcreteFactory struct{}
+// factoryImpl is a concrete factory
+type factoryImpl struct{}
 
-func NewFactory() (factory *ConcreteFactory) {
-	return new(ConcreteFactory)
+// New returns a command factory instance
+func NewFactory() *factoryImpl {
+	return new(factoryImpl)
 }
 
-// MakeCommandFromMetatdata creates a new command with the given metadata.
-func (cf *ConcreteFactory) MakeCommandFromMetatdata(meta Metadata) (c Command) {
-	c = NewCommand()
-	c.SetMetadata(meta)
-	return
+// MakeCommand creates a new command
+func (f *factoryImpl) MakeCommand() Command {
+	return Command(NewEntry())
 }
