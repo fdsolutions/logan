@@ -1,14 +1,16 @@
-package command_test
+package args_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/fdsolutions/logan/command"
+	. "github.com/fdsolutions/logan/args"
 )
 
 var (
 	defaultFlags = map[string]bool{"--help": false, "--version": false, "--sudo": false}
+
+	paramParser ParamParser
 
 	userInputExamples = []struct {
 		in       string
@@ -43,8 +45,9 @@ var (
 var _ = Describe("args", func() {
 
 	It("should parse user inputs", func() {
+		paramParser = NewParamParser()
 		for _, input := range userInputExamples {
-			var got, _ = ArgsFromInput(input.in)
+			var got, _ = ParseInputWithParser(input.in, paramParser)
 			var expected = input.expected
 			Expect(got).To(Equal(expected))
 		}
