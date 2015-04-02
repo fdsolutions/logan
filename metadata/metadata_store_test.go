@@ -76,6 +76,14 @@ var _ = Describe("MetadataStore", func() {
 					Expect(entries).To(ContainElement(*expEntry))
 				})
 			})
+
+			Context("When call twice or more", func() {
+				It("Should not load data again", func() {
+					store.QueryAll()
+					store.QueryAll()
+					Expect(store.HasDataAlreadyLoaded()).To(BeTrue())
+				})
+			})
 		})
 
 		Describe("#Query", func() {

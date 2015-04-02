@@ -49,9 +49,16 @@ func (fs *FileStore) Query(cond func(Entry) bool) []Entry {
 // It returns an error as a second return value if something bad happens,
 // this to enable error handling
 func (fs *FileStore) QueryAll() (entries []Entry, err error) {
+	if fs.HasDataAlreadyLoaded() {
+		return fs.data, nil
+	}
 	err = fs.load()
-	entries = fs.data
-	return
+	return fs.data, err
+}
+
+// HasDataAlreadyLoaded checks whether or not data are loaded
+func (fs *FileStore) HasDataAlreadyLoaded() bool {
+	return (fs.data != nil && len(fs.data) > 1)
 }
 
 func (fs *FileStore) load() (err error) {

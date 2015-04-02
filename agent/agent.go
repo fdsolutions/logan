@@ -3,7 +3,7 @@ package agent
 type Action struct {
 }
 
-// Agent is the one which execute command
+// Agent perform actions related to user inputs
 type Agent interface {
 	Perform(Action)
 }
