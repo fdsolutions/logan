@@ -61,3 +61,13 @@ func (entry *Entry) AutoFill() {
 	entry.Target = target
 	entry.Context = context
 }
+
+// SetPath set the path of the metadata entry
+func (entry *Entry) SetPath(path string) {
+	entry.Path = path
+}
+
+// SetRequiredParams set the required params of the metadata entry
+func (entry *Entry) SetRequiredParams(params []string) {
+	entry.RequiredParams = params
+}
