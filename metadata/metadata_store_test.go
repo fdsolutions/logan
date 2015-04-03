@@ -17,26 +17,17 @@ var (
 	UnsupportedFilePath string = filepath.Join("..", "fixtures", "unsupported_yaml.metas")
 )
 
-const testGoal = "show:version"
+const TestGoal = "show:version"
 
 var _ = Describe("MetadataStore", func() {
 
 	var (
 		store, emptyStore *FileStore
-		predicateForGoal  func(string) Predicate
 	)
 
 	BeforeEach(func() {
 		store, _ = NewFileStore(ExistingPath)
 		emptyStore, _ = NewFileStore(EmptyFilePath)
-
-		// A simple predicate generator
-		predicateForGoal = func(goal string) Predicate {
-			var predicate Predicate = func(entry Entry) bool {
-				return (entry.Goal == goal)
-			}
-			return predicate
-		}
 	})
 
 	Describe(".NewFileStore", func() {
@@ -66,8 +57,8 @@ var _ = Describe("MetadataStore", func() {
 		Describe("#QueryAll", func() {
 			Context("With an a empty source file", func() {
 				It("should return an empty metadata collection", func() {
-					metas, _ := emptyStore.QueryAll()
-					Expect(metas).To(BeNil())
+					entries, _ := emptyStore.QueryAll()
+					Expect(entries).To(BeEmpty())
 				})
 			})
 
@@ -84,11 +75,11 @@ var _ = Describe("MetadataStore", func() {
 				It("should return all metadata entries from store file", func() {
 					entries, _ := store.QueryAll()
 					expEntry := NewFromGoal("copy:file:unix")
-					expEntry.Path = "/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>"
-					expEntry.RequiredParams = []string{
+					expEntry.SetPath("/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>")
+					expEntry.SetRequiredParams([]string{
 						"<SOURCE_FILE>",
 						"<DESTINATION_FILE>",
-					}
+					})
 					Expect(entries).To(ContainElement(*expEntry))
 				})
 			})
@@ -117,14 +108,13 @@ var _ = Describe("MetadataStore", func() {
 
 			Context("With a predicate and a goal name provided ", func() {
 				It("should always return an empty collection form an empty store", func() {
-					entries := emptyStore.Query(predicateForGoal(testGoal))
+					entries := emptyStore.Query(PredicateForGoal(TestGoal))
 					Expect(entries).To(BeEmpty())
 				})
 
 				It("should return a collection with only one entry", func() {
-					goalName := "show:version"
-					entries := store.Query(predicateForGoal(testGoal))
-					expEntry := NewFromGoal(goalName)
+					entries := store.Query(PredicateForGoal(TestGoal))
+					expEntry := NewFromGoal(TestGoal)
 					Expect(entries).To(ContainElement(*expEntry))
 				})
 

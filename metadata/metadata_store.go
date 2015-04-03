@@ -40,6 +40,15 @@ func (fs *FileStore) Filepath() string {
 	return fs.filePath
 }
 
+// PredicateForGoal create a predicate to retrieve metadata entry
+// of the given goal.
+func PredicateForGoal(goal string) Predicate {
+	var predicate Predicate = func(entry Entry) bool {
+		return (entry.Goal == goal)
+	}
+	return predicate
+}
+
 // Query tries to find metadata entries that match the given predicace
 func (fs *FileStore) Query(cond Predicate) []Entry {
 	entries, _ := fs.QueryAll()
