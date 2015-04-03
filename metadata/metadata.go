@@ -45,37 +45,19 @@ func NewFromGoalParts(intent string, target string, context string) *Entry {
 	var entry *Entry
 	goal := strings.Join([]string{intent, target, context}, goalPartsSeparator)
 	entry = NewEntry()
-	entry.Goal = goal
+	// Removes possible ':' around the goal name.
+	entry.Goal = strings.Trim(goal, goalPartsSeparator)
 	entry.Intent = intent
 	entry.Target = target
 	entry.Context = context
 	return entry
 }
 
-// Repository is a set of methods that a metadata repository must implement
-type Repository interface {
-	GetStore() Store
-}
-
-// repositoryImpl is a repository used to find command metadata
-// It has its own store.
-type repositoryImpl struct {
-	store Store
-}
-
-// NewRepository returns a new repository
-func NewRepository() *repositoryImpl {
-	return &repositoryImpl{}
-}
-
-// NewFromStore returns a new repository and set its store at the same time.
-func NewRepositoryFromStore(s Store) *repositoryImpl {
-	repo := NewRepository()
-	repo.store = s
-	return repo
-}
-
-// GetStore returns the metadata store of the repository
-func (r *repositoryImpl) GetStore() Store {
-	return r.store
+// AutoFill make sure that fiels Intent, Target, Context
+// are filled with values got from the Goal field
+func (entry *Entry) AutoFill() {
+	intent, target, context := SplitInGoalParts(entry.Goal)
+	entry.Intent = intent
+	entry.Target = target
+	entry.Context = context
 }
