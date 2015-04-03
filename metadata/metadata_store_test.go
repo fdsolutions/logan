@@ -10,18 +10,33 @@ import (
 	. "github.com/fdsolutions/logan/metadata"
 )
 
+var (
+	UnexistingPath      string = filepath.Join("..", "fixtures", "nofile.metas")
+	ExistingPath        string = filepath.Join("..", "fixtures", "command_examples.metas")
+	EmptyFilePath       string = filepath.Join("..", "fixtures", "empty.metas")
+	UnsupportedFilePath string = filepath.Join("..", "fixtures", "unsupported_yaml.metas")
+)
+
+const testGoal = "show:version"
+
 var _ = Describe("MetadataStore", func() {
+
 	var (
-		unexistingPath      string = filepath.Join("..", "fixtures", "nofile.metas")
-		existingPath        string = filepath.Join("..", "fixtures", "command_examples.metas")
-		emptyFilePath       string = filepath.Join("..", "fixtures", "empty.metas")
-		unsupportedFilePath string = filepath.Join("..", "fixtures", "unsupported_yaml.metas")
-		store, emptyStore   *FileStore
+		store, emptyStore *FileStore
+		predicateForGoal  func(string) Predicate
 	)
 
 	BeforeEach(func() {
-		store, _ = NewFileStore(existingPath)
-		emptyStore, _ = NewFileStore(emptyFilePath)
+		store, _ = NewFileStore(ExistingPath)
+		emptyStore, _ = NewFileStore(EmptyFilePath)
+
+		// A simple predicate generator
+		predicateForGoal = func(goal string) Predicate {
+			var predicate Predicate = func(entry Entry) bool {
+				return (entry.Goal == goal)
+			}
+			return predicate
+		}
 	})
 
 	Describe(".NewFileStore", func() {
@@ -34,15 +49,15 @@ var _ = Describe("MetadataStore", func() {
 
 		Context("Given an unexisting filepath", func() {
 			It("should return an ErrFileDontExistAtPath", func() {
-				_, err := NewFileStore(unexistingPath)
+				_, err := NewFileStore(UnexistingPath)
 				Expect(err).To(MatchError(errors.New(ErrInvalidFilePath)))
 			})
 		})
 
 		Context("Given an existing filepath", func() {
 			It("should get back an intance of the store", func() {
-				store, _ = NewFileStore(existingPath)
-				Expect(store.Filepath()).To(Equal(existingPath))
+				store, _ = NewFileStore(ExistingPath)
+				Expect(store.Filepath()).To(Equal(ExistingPath))
 			})
 		})
 	})
@@ -55,19 +70,20 @@ var _ = Describe("MetadataStore", func() {
 					Expect(metas).To(BeNil())
 				})
 			})
+
 			Context("With a source file containing metadata in a non-JOSN format", func() {
 				It("should return an ErrUnsupportedFileFormat", func() {
-					store, _ := NewFileStore(unsupportedFilePath)
+					store, _ := NewFileStore(UnsupportedFilePath)
 					_, err := store.QueryAll()
 					Expect(err).To(MatchError(errors.New(ErrUnsupportedFileFormat)))
 				})
 			})
+
 			Context("With a file containing metadata in JSON format", func() {
 				// TODO : Make the choice of element random in asserion 'containElement'
 				It("should return all metadata entries from store file", func() {
 					entries, _ := store.QueryAll()
-					expEntry := NewEntry()
-					expEntry.Goal = "copy:file:unix"
+					expEntry := NewFromGoal("copy:file:unix")
 					expEntry.Path = "/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>"
 					expEntry.RequiredParams = []string{
 						"<SOURCE_FILE>",
@@ -87,24 +103,32 @@ var _ = Describe("MetadataStore", func() {
 		})
 
 		Describe("#Query", func() {
-			Context("With no predicate", func() {
-				It("should query all entries", func() {
+			Context("With no predicate provided", func() {
+				It("should always return an empty collection from an empty store", func() {
+					entries := emptyStore.Query(nil)
+					Expect(entries).To(BeEmpty())
+				})
+
+				It("should return all entries from an none empty store", func() {
 					entries := store.Query(nil)
-					Expect(entries).ToNot(BeEmpty())
+					Expect(entries).NotTo(BeEmpty())
 				})
 			})
 
-			Context("Entries of a given goal name", func() {
-				It("should get all entries of that goal name", func() {
+			Context("With a predicate and a goal name provided ", func() {
+				It("should always return an empty collection form an empty store", func() {
+					entries := emptyStore.Query(predicateForGoal(testGoal))
+					Expect(entries).To(BeEmpty())
+				})
+
+				It("should return a collection with only one entry", func() {
 					goalName := "show:version"
-					entries := store.Query(func(ent Entry) bool {
-						return (ent.Goal == goalName)
-					})
-					expEntry := NewEntry()
-					expEntry.Goal = "show:version"
-					expEntry.Target = "version"
+					entries := store.Query(predicateForGoal(testGoal))
+					expEntry := NewFromGoal(goalName)
 					Expect(entries).To(ContainElement(*expEntry))
 				})
+
+				PIt("Must return an ErrMetadataConflict if many metadata are found for that goal name.")
 			})
 		})
 	})

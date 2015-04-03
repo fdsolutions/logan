@@ -8,11 +8,15 @@ import (
 	"github.com/fdsolutions/logan/helper"
 )
 
+// Predicate is a closure that identicate whether or not an entry
+// be added to a query result
+type Predicate func(ent Entry) bool
+
 // Store defines abstract operations to implement for a metadata store
 type Store interface {
 	Filepath() string
-	QueryAll() []Entry
-	Query(cond func(Entry) bool) []Entry
+	QueryAll() ([]Entry, error)
+	Query(cond Predicate) []Entry
 }
 
 // FileStore is a metadata store using file as a data source
@@ -37,7 +41,7 @@ func (fs *FileStore) Filepath() string {
 }
 
 // Query tries to find metadata entries that match the given predicace
-func (fs *FileStore) Query(cond func(Entry) bool) []Entry {
+func (fs *FileStore) Query(cond Predicate) []Entry {
 	entries, _ := fs.QueryAll()
 	if cond == nil {
 		return entries
@@ -68,21 +72,29 @@ func (fs *FileStore) load() (err error) {
 }
 
 func (fs *FileStore) loadFromJSON(content []byte) (err error) {
-	var metas []Entry
-	err = json.Unmarshal(content, &metas)
+	var entries []*Entry
+	err = json.Unmarshal(content, &entries)
 	if err != nil {
 		return errors.New(ErrUnsupportedFileFormat)
 	}
-	fs.data = metas
+	fs.setDataAndAutoFillEachEntry(entries)
 	return
 }
 
-func (fs *FileStore) filterThrough(cond func(Entry) bool) []Entry {
-	selectedEntries := []Entry{}
+func (fs *FileStore) setDataAndAutoFillEachEntry(entries []*Entry) {
+	fs.data = []Entry{}
+	for _, entry := range entries {
+		entry.AutoFill()
+		fs.data = append(fs.data, *entry)
+	}
+}
+
+func (fs *FileStore) filterThrough(cond Predicate) []Entry {
+	filteredEntries := []Entry{}
 	for _, entry := range fs.data {
 		if ok := cond(entry); ok {
-			selectedEntries = append(selectedEntries, entry)
+			filteredEntries = append(filteredEntries, entry)
 		}
 	}
-	return selectedEntries
+	return filteredEntries
 }
