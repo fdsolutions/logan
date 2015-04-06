@@ -26,15 +26,15 @@ var (
 	}
 )
 
-// Args holds CLI argument elements
-type Args struct {
+// Arg holds CLI argument elements
+type Arg struct {
 	Name   string
 	Flags  map[string]bool
 	Params map[string]string
 }
 
 // ArgFromInput returns argument elements from user command input
-func ParseInputWithParser(input string, pp ParamParser) (args Args, e error) {
+func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e error) {
 	argv := strings.Split(input, " ")
 
 	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false)
@@ -42,16 +42,16 @@ func ParseInputWithParser(input string, pp ParamParser) (args Args, e error) {
 		e = errors.New(ErrInvalidInput)
 		return
 	}
-	args = parseArgsElementsWithParser(parsedArgs, pp)
+	arg = parseArgElementsWithParser(parsedArgs, pp)
 	return
 }
 
-func parseArgsElementsWithParser(args map[string]interface{}, pp ParamParser) Args {
+func parseArgElementsWithParser(args map[string]interface{}, pp ParamParser) Arg {
 	name := parseName(args)
 	flags := parseFlags(args)
 	params, _ := parseParamsWithParser(args, pp) // No error handling if fails
 
-	return Args{name, flags, params}
+	return Arg{name, flags, params}
 }
 
 func parseName(args map[string]interface{}) string {

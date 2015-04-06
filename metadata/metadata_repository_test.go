@@ -44,7 +44,7 @@ var _ = Describe("MetadataRepository", func() {
 
 		It("Should the metatdata entry of the given goal.", func() {
 			entry := r.FindByGoal(TestGoal)
-			expected := NewFromGoal(TestGoal)
+			expected := FromGoal(TestGoal)
 			Expect(entry).To(Equal(*expected))
 		})
 	})

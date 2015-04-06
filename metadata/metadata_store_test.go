@@ -72,7 +72,7 @@ var _ = Describe("MetadataStore", func() {
 				// TODO : Make the choice of element random in asserion 'containElement'
 				It("should return all metadata entries from store file", func() {
 					entries, _ := store.QueryAll()
-					expEntry := NewFromGoal(TestGoalWithContext)
+					expEntry := FromGoal(TestGoalWithContext)
 					expEntry.SetPath("/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>")
 					expEntry.SetRequiredParams([]string{
 						"<SOURCE_FILE>",
@@ -112,7 +112,7 @@ var _ = Describe("MetadataStore", func() {
 
 				It("should return a collection with only one entry", func() {
 					entries := store.Query(PredicateForGoal(TestGoal))
-					expEntry := NewFromGoal(TestGoal)
+					expEntry := FromGoal(TestGoal)
 					Expect(entries).To(ContainElement(*expEntry))
 				})
 

@@ -1,4 +1,4 @@
-package command_test
+package agent_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCommand(t *testing.T) {
+func TestAgent(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Command Suite")
+	RunSpecs(t, "Agent Suite")
 }

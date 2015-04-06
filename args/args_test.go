@@ -14,26 +14,26 @@ var (
 
 	userInputExamples = []struct {
 		in       string
-		expected Args
+		expected Arg
 	}{
 		{"--sudo start:server",
-			Args{"start:server",
+			Arg{"start:server",
 				map[string]bool{"--help": false, "--version": false, "--sudo": true},
 				nil}},
 		{"show:help",
-			Args{"show:help",
+			Arg{"show:help",
 				defaultFlags,
 				nil}},
 		{"install:pkg:ubuntu PKG_NAME='apache'",
-			Args{"install:pkg:ubuntu",
+			Arg{"install:pkg:ubuntu",
 				defaultFlags,
 				map[string]string{"PKG_NAME": "apache"}}},
 		{"connect:database:mysql DATABASE_NAME='mysqldb'",
-			Args{"connect:database:mysql",
+			Arg{"connect:database:mysql",
 				defaultFlags,
 				map[string]string{"DATABASE_NAME": "mysqldb"}}},
 		{"--sudo connect:database:mysql DATABASE_NAME='mysqldb' USER='root' PASSWORD='root' VERSION=1.0.1",
-			Args{"connect:database:mysql",
+			Arg{"connect:database:mysql",
 				map[string]bool{"--help": false, "--version": false, "--sudo": true},
 				map[string]string{"DATABASE_NAME": "mysqldb",
 					"USER":     "root",

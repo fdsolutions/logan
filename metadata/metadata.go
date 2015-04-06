@@ -11,13 +11,13 @@ const (
 	numberOfGoalParts  int    = 3
 	noPartValue        string = ""
 
-	ErrConflictingCommandFound errors.ErrorCode = `Command conflict : 
-at least two command found for the same goal`
+	ErrConflictingActionFound errors.ErrorCode = `Action conflict : 
+at least two actions found for the same goal`
 	ErrInvalidFilePath       errors.ErrorCode = "Invalid store source file path"
 	ErrUnsupportedFileFormat errors.ErrorCode = "Unsupported file format: can't load data from store file"
 )
 
-// Entry holds command metadata
+// Entry holds action's metadata
 type Entry struct {
 	Goal           string   `json:"goal"`
 	Intent         string   `json:"intent"`
@@ -32,16 +32,16 @@ func NewEntry() *Entry {
 	return &Entry{}
 }
 
-// NewFromGoal instanciate a new metadata from command goal
-func NewFromGoal(goal string) *Entry {
+// FromGoal instanciate a new metadata entry from an action goal
+func FromGoal(goal string) *Entry {
 	intent, target, ctx := SplitInGoalParts(goal)
-	return NewFromGoalParts(intent, target, ctx)
+	return FromGoalParts(intent, target, ctx)
 }
 
-// NewFromGoalParts creates a metadata object from its goal.
+// FromGoalParts creates a metadata object from its goal.
 // A goal is compose of (intent, target, context).
 // Make sure parameters are in the right order.
-func NewFromGoalParts(intent string, target string, context string) *Entry {
+func FromGoalParts(intent string, target string, context string) *Entry {
 	var entry *Entry
 	goal := strings.Join([]string{intent, target, context}, goalPartsSeparator)
 	entry = NewEntry()
