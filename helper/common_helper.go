@@ -1,4 +1,4 @@
-package helpers
+package helper
 
 import (
 	log "github.com/fdsolutions/logan/log"
@@ -26,7 +26,7 @@ func fieldify(input string) map[string]string {
 	}
 }
 
-// arr2Map is an helper function that tranform an array of array to a map
+// ArrayToMap is an helper function that tranform an array of array to a map
 func ArrayToMap(arr [][]string) map[string]string {
 	m := make(map[string]string)
 	for _, innerArr := range arr {
