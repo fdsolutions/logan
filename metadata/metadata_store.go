@@ -49,6 +49,16 @@ func PredicateForGoal(goal string) Predicate {
 	return predicate
 }
 
+// PredicateForContext create a predicate to retrieve metadata entry
+// of the given context.
+func PredicateForContext(ctx string) Predicate {
+	var predicate Predicate = func(entry Entry) bool {
+		_, _, context := SplitInGoalParts(entry.Goal)
+		return (context == ctx)
+	}
+	return predicate
+}
+
 // Query tries to find metadata entries that match the given predicace
 func (fs *FileStore) Query(cond Predicate) []Entry {
 	entries, _ := fs.QueryAll()
@@ -75,7 +85,7 @@ func (fs *FileStore) HasDataAlreadyLoaded() bool {
 }
 
 func (fs *FileStore) load() (err error) {
-	jsonContentAsBytes, _ := ioutil.ReadFile(fs.filePath)
+	jsonContentAsBytes, _ := ioutil.ReadFile(fs.Filepath())
 	err = fs.loadFromJSON(jsonContentAsBytes)
 	return
 }

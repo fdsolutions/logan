@@ -17,8 +17,6 @@ var (
 	UnsupportedFilePath string = filepath.Join("..", "fixtures", "unsupported_yaml.metas")
 )
 
-const TestGoal = "show:version"
-
 var _ = Describe("MetadataStore", func() {
 
 	var (
@@ -74,7 +72,7 @@ var _ = Describe("MetadataStore", func() {
 				// TODO : Make the choice of element random in asserion 'containElement'
 				It("should return all metadata entries from store file", func() {
 					entries, _ := store.QueryAll()
-					expEntry := NewFromGoal("copy:file:unix")
+					expEntry := NewFromGoal(TestGoalWithContext)
 					expEntry.SetPath("/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>")
 					expEntry.SetRequiredParams([]string{
 						"<SOURCE_FILE>",

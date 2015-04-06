@@ -56,9 +56,12 @@ func (r *repositoryImpl) FindByGoal(g string) (entry Entry) {
 	if len(entries) < 1 {
 		return
 	}
-	return entries[0]
+	entry = entries[0]
+	return
 }
 
+// FindByContext returns all metadata entries related to a given context
 func (r *repositoryImpl) FindByContext(ctx string) (entries []Entry) {
+	entries = r.getStore().Query(PredicateForContext(ctx))
 	return
 }
