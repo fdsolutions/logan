@@ -38,14 +38,24 @@ func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e errors.Logan
 		pp = GetDefaultParamParser()
 	}
 
-	argv := strings.Split(input, " ")
-	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false)
-	if err != nil {
+	argv := getArgvFromInput(input)
+	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, true, false)
+	if err != nil || parsedArgs == nil {
 		e = errors.New(errors.ErrInvalidInput)
 		return
 	}
+
 	arg = parseArgElementsWithParser(parsedArgs, pp)
 	return
+}
+
+func getArgvFromInput(input string) (argv []string) {
+	// Sanitize the given  input
+	in := strings.TrimSpace(input)
+	if in == "" {
+		return
+	}
+	return strings.Split(in, " ")
 }
 
 // GetDefaultParamParser returns the default param parser for args

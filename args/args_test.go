@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/fdsolutions/logan/args"
+	"github.com/fdsolutions/logan/errors"
 )
 
 var (
@@ -43,6 +44,20 @@ var (
 )
 
 var _ = Describe("args", func() {
+
+	Context("With no input or multiple space as input", func() {
+		It("Should fail and return an error ErrInvalidInput ", func() {
+			examples := []string{
+				"",
+				" ",
+				"     ",
+			}
+			for _, exp := range examples {
+				var _, err = ParseInputWithParser(exp, nil)
+				Expect(err.Code()).To(Equal(errors.ErrInvalidInput))
+			}
+		})
+	})
 
 	Context("With no given param parser", func() {
 		It("Should parse user input using the default parser", func() {

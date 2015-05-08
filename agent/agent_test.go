@@ -9,6 +9,7 @@ import (
 
 	. "github.com/fdsolutions/logan/agent"
 	"github.com/fdsolutions/logan/errors"
+	//"github.com/fdsolutions/logan/helper"
 )
 
 var _ = Describe("Agent", func() {

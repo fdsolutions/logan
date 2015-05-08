@@ -1,10 +1,11 @@
 package agent
 
 import (
-	//"io"
+	//"fmt"
 
 	"github.com/fdsolutions/logan/action"
 	"github.com/fdsolutions/logan/args"
+	//"github.com/fdsolutions/logan/helper"
 	"github.com/fdsolutions/logan/metadata"
 )
 
@@ -43,6 +44,7 @@ func FromFactoryAndRepos(factory action.Factory, repos []metadata.Repository) (a
 // You can change the behavior by overriding function from the agent API
 func (a *Agent) PerformActionFromInput(input string) Status {
 	s := a.parseUserInput(input)
+
 	if s.GetCode() == StatusFail {
 		return s
 	}
@@ -55,6 +57,9 @@ func (a *Agent) PerformActionFromInput(input string) Status {
 
 func (a *Agent) parseUserInput(input string) Status {
 	var s Status
+	if input == "" {
+
+	}
 	arg, err := args.ParseInputWithParser(input, a.GetParser())
 	if err != nil {
 		s = NewStatus(StatusFail, input)
