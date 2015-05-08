@@ -44,13 +44,25 @@ var (
 
 var _ = Describe("args", func() {
 
-	It("should parse user inputs", func() {
-		paramParser = NewParamParser()
-		for _, input := range userInputExamples {
-			var got, _ = ParseInputWithParser(input.in, paramParser)
-			var expected = input.expected
-			Expect(got).To(Equal(expected))
-		}
+	Context("With no given param parser", func() {
+		It("Should parse user input using the default parser", func() {
+			for _, input := range userInputExamples {
+				var got, _ = ParseInputWithParser(input.in, nil)
+				var expected = input.expected
+				Expect(got).To(Equal(expected))
+			}
+		})
+	})
+
+	Context("With given param parser", func() {
+		It("should parse user inputs", func() {
+			paramParser = NewParamParser()
+			for _, input := range userInputExamples {
+				var got, _ = ParseInputWithParser(input.in, paramParser)
+				var expected = input.expected
+				Expect(got).To(Equal(expected))
+			}
+		})
 	})
 
 })

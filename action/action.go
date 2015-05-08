@@ -13,7 +13,6 @@ const (
 type LoganAction interface {
 	GetMetadata() metadata.Entry
 	SetMetadata(meta metadata.Entry)
-	Run() error
 }
 
 // actionImpl is a concrete action
@@ -33,9 +32,4 @@ func (c *actionImpl) GetMetadata() metadata.Entry {
 // SetMetadata is the getter for meta attribute of the action
 func (c *actionImpl) SetMetadata(meta metadata.Entry) {
 	c.meta = meta
-}
-
-// Run executes the action
-func (c *actionImpl) Run() error {
-	return errors.New(ErrInvalidAction)
 }

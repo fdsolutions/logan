@@ -13,9 +13,6 @@ import (
 
 const (
 	argsParamsRegexPattern = `(?:(\w*)='?([^']*)'?)*`
-
-	ErrInvalidInput  errors.ErrorCode = "Invalid input."
-	ErrInvalidParams errors.ErrorCode = "Invalid params : No params retreived from user input."
 )
 
 var (
@@ -24,6 +21,8 @@ var (
 		"VERSION": "--version",
 		"SUDO":    "--sudo",
 	}
+
+	defaultParamParser = NewParamParser()
 )
 
 // Arg holds CLI argument elements
@@ -34,16 +33,24 @@ type Arg struct {
 }
 
 // ArgFromInput returns argument elements from user command input
-func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e error) {
-	argv := strings.Split(input, " ")
+func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e errors.LoganError) {
+	if pp == nil {
+		pp = GetDefaultParamParser()
+	}
 
+	argv := strings.Split(input, " ")
 	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false)
 	if err != nil {
-		e = errors.New(ErrInvalidInput)
+		e = errors.New(errors.ErrInvalidInput)
 		return
 	}
 	arg = parseArgElementsWithParser(parsedArgs, pp)
 	return
+}
+
+// GetDefaultParamParser returns the default param parser for args
+func GetDefaultParamParser() ParamParser {
+	return defaultParamParser
 }
 
 func parseArgElementsWithParser(args map[string]interface{}, pp ParamParser) Arg {
@@ -68,11 +75,11 @@ func parseFlags(args map[string]interface{}) (flags map[string]bool) {
 }
 
 // parseParamsWithParser  parses arguments and retrives argument's parameters as a key/value pairs
-func parseParamsWithParser(args map[string]interface{}, pp ParamParser) (map[string]string, error) {
+func parseParamsWithParser(args map[string]interface{}, pp ParamParser) (map[string]string, errors.LoganError) {
 	argsParamList, _ := args[usage.CommandArgParamsName].([]string)
 	params, ok := parseParamListWithParser(argsParamList, pp)
 	if !ok {
-		return nil, errors.New(ErrInvalidParams)
+		return nil, errors.New(errors.ErrInvalidParams)
 	}
 	return helper.ArrayToMap(params), nil
 }

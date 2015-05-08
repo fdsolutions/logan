@@ -1,23 +1,19 @@
 package agent
 
 import (
-	"io"
+	//"io"
 
 	"github.com/fdsolutions/logan/action"
-	"github.com/fdsolutions/logan/errors"
+	"github.com/fdsolutions/logan/args"
 	"github.com/fdsolutions/logan/metadata"
 )
 
-const (
-	ErrFailToPerfomAction errors.ErrorCode = "Fail to perfom action"
-)
-
-type Api interface {
-	ParseUserInput(input string) Status
-	RegisterRepo(r metadata.Repository) Status
-	LookupActionInRepos(goal string, repos []metadata.Repository) Status
-	Perform(action.LoganAction) Status
-	PrintOutput(output, printer io.Writer) Status
+type API interface {
+	PerformActionFromInput(input string) Status
+	// RegisterRepo(r metadata.Repository) Status
+	// LookupActionInRepos(goal string, repos []metadata.Repository) Status
+	// Perform(action.LoganAction) Status
+	// PrintOutput(output, printer io.Writer) Status
 }
 
 // Agent is a logan agent
@@ -25,12 +21,19 @@ type Agent struct {
 	actionMaker action.Factory
 	metaRepos   []metadata.Repository
 	statusStack []Status
-	Api
+	parser      args.ParamParser
+	API
 }
 
-func FromFactoryAndRepos(f action.Factory, repos []metadata.Repository) (a *Agent) {
+// GetParser returns the agent's param parser
+func (a *Agent) GetParser() args.ParamParser {
+	return a.parser
+}
+
+// FromFactoryAndRepos returns a instnace of a agent with a given factory  and repositories.
+func FromFactoryAndRepos(factory action.Factory, repos []metadata.Repository) (a *Agent) {
 	a = &Agent{}
-	a.actionMaker = f
+	a.actionMaker = factory
 	a.metaRepos = repos
 	return
 }
@@ -39,10 +42,26 @@ func FromFactoryAndRepos(f action.Factory, repos []metadata.Repository) (a *Agen
 // It follows a the template method pattern with a clear workflow
 // You can change the behavior by overriding function from the agent API
 func (a *Agent) PerformActionFromInput(input string) Status {
-	// var (
-	// 	status  Status
-	// 	action  action.LoganAction
-	// 	outFile io.Writer
-	// )
+	s := a.parseUserInput(input)
+	if s.GetCode() == StatusFail {
+		return s
+	}
+
+	if _, ok := s.GetValue().(args.Arg); ok {
+
+	}
 	return NewStatus(StatusSuccess, nil)
+}
+
+func (a *Agent) parseUserInput(input string) Status {
+	var s Status
+	arg, err := args.ParseInputWithParser(input, a.GetParser())
+	if err != nil {
+		s = NewStatus(StatusFail, input)
+		s.StackError(err)
+		return s
+	}
+
+	s = NewStatus(StatusSuccess, arg)
+	return s
 }
