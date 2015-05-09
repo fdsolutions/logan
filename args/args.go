@@ -39,7 +39,7 @@ func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e errors.Logan
 	}
 
 	argv := getArgvFromInput(input)
-	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, true, false)
+	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false, false)
 	if err != nil || parsedArgs == nil {
 		e = errors.New(errors.ErrInvalidInput)
 		return

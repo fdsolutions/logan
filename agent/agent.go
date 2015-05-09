@@ -1,11 +1,8 @@
 package agent
 
 import (
-	//"fmt"
-
 	"github.com/fdsolutions/logan/action"
 	"github.com/fdsolutions/logan/args"
-	//"github.com/fdsolutions/logan/helper"
 	"github.com/fdsolutions/logan/metadata"
 )
 
@@ -50,16 +47,13 @@ func (a *Agent) PerformActionFromInput(input string) Status {
 	}
 
 	if _, ok := s.GetValue().(args.Arg); ok {
-
 	}
 	return NewStatus(StatusSuccess, nil)
 }
 
 func (a *Agent) parseUserInput(input string) Status {
 	var s Status
-	if input == "" {
 
-	}
 	arg, err := args.ParseInputWithParser(input, a.GetParser())
 	if err != nil {
 		s = NewStatus(StatusFail, input)

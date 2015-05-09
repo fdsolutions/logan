@@ -21,6 +21,10 @@ var (
 			Arg{"start:server",
 				map[string]bool{"--help": false, "--version": false, "--sudo": true},
 				nil}},
+		{"start:server --sudo ", // Test overlaping
+			Arg{"start:server",
+				map[string]bool{"--help": false, "--version": false, "--sudo": true},
+				nil}},
 		{"show:help",
 			Arg{"show:help",
 				defaultFlags,
