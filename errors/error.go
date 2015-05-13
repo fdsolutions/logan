@@ -6,11 +6,13 @@ import (
 
 const (
 	// Agent
-	ErrInvalidUserInput ErrorCode = "Invalid user inputs."
+	ErrInvalidUserInput ErrorCode = "Agent: Invalid user inputs."
+	ErrInvalidGoal      ErrorCode = "Agent: Invalid goal."
+	ErrActionNotFound   ErrorCode = "Agent: No action found for the given goal."
 
 	// Arg parsing
-	ErrInvalidInput  ErrorCode = "Invalid input."
-	ErrInvalidParams ErrorCode = "Invalid params : No params retreived from user input."
+	ErrInvalidInput  ErrorCode = "Args: Invalid input."
+	ErrInvalidParams ErrorCode = "Args: Invalid params. No params retreived from user input."
 )
 
 // ErrorCode is a generic error type

@@ -1,8 +1,8 @@
 package agent_test
 
 import (
-	"fmt"
-	"reflect"
+	//"fmt"
+	//"reflect"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,21 +34,30 @@ var _ = Describe("Agent", func() {
 		agent = FromFactoryAndRepos(nil, nil)
 	})
 
-	Describe(".PerformActionFromInput", func() {
+	Describe(".ParseUserInput", func() {
 		Context("With an invalid input", func() {
 			It("Should fail with the error ErrInvalidUserInput", func() {
-				status := agent.PerformActionFromInput(usersInputExamples[WithNothing])
-				errValue := status.GetValue()
-				if _, ok := errValue.(errors.ErrorCode); !ok {
-					Fail(fmt.Sprintf("The status value must be of type errors.ErrorCode but %v [%v]", reflect.TypeOf(errValue), errValue))
-				}
-				Expect(status.GetErrorStackCodes()).To(ContainElement(errors.ErrInvalidUserInput))
+				s := agent.ParseUserInput(usersInputExamples[WithNothing])
+				Expect(s.GetErrorStackCodes()).To(ContainElement(errors.ErrInvalidUserInput))
 			})
 		})
 		Context("With a valid input", func() {
 			It("Should parse user's input as an action with no parameters", func() {
-				status := agent.PerformActionFromInput(usersInputExamples[WithOnlyAction])
-				Expect(status.GetCode()).To(Equal(StatusSuccess))
+				s := agent.ParseUserInput(usersInputExamples[WithOnlyAction])
+				Expect(s.GetCode()).To(Equal(StatusSuccess))
+			})
+		})
+	})
+	Describe(".LookupActionInRepos", func() {
+		Context("With empty goal and no repos provided", func() {
+			It("Should fail with an ErrInvalidGoal error.", func() {
+				s := agent.LookupActionInRepos("", nil)
+				Expect(s.GetErrorStackCodes()).To(ContainElement(errors.ErrInvalidGoal))
+			})
+		})
+		Context("With a gaol not referenced in any provided repos", func() {
+			XIt("Should return an ErrActionNotFound error.", func() {
+
 			})
 		})
 	})

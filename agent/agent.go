@@ -3,13 +3,15 @@ package agent
 import (
 	"github.com/fdsolutions/logan/action"
 	"github.com/fdsolutions/logan/args"
+	"github.com/fdsolutions/logan/errors"
 	"github.com/fdsolutions/logan/metadata"
 )
 
 type API interface {
-	PerformActionFromInput(input string) Status
+	ParseUserInput(input string) Status
+	LookupActionInRepos(goal string, repos []metadata.Repository) Status
+	//PerformActionFromInput(input string) Status
 	// RegisterRepo(r metadata.Repository) Status
-	// LookupActionInRepos(goal string, repos []metadata.Repository) Status
 	// Perform(action.LoganAction) Status
 	// PrintOutput(output, printer io.Writer) Status
 }
@@ -24,43 +26,62 @@ type Agent struct {
 }
 
 // GetParser returns the agent's param parser
-func (a *Agent) GetParser() args.ParamParser {
-	return a.parser
+func (ag *Agent) GetParser() args.ParamParser {
+	return ag.parser
 }
 
 // FromFactoryAndRepos returns a instnace of a agent with a given factory  and repositories.
-func FromFactoryAndRepos(factory action.Factory, repos []metadata.Repository) (a *Agent) {
-	a = &Agent{}
-	a.actionMaker = factory
-	a.metaRepos = repos
-	return
+func FromFactoryAndRepos(factory action.Factory, repos []metadata.Repository) *Agent {
+	ag := &Agent{}
+	ag.actionMaker = factory
+	ag.metaRepos = repos
+	return ag
 }
 
 // PerformActionFromInput processes user input and perform the action related ot the input.
 // It follows a the template method pattern with a clear workflow
 // You can change the behavior by overriding function from the agent API
-func (a *Agent) PerformActionFromInput(input string) Status {
-	s := a.parseUserInput(input)
+// func (a *Agent) PerformActionFromInput(input string) Status {
+// 	s := a.ParseUserInput(input)
 
-	if s.GetCode() == StatusFail {
-		return s
-	}
+// 	if s.GetCode() == StatusFail {
+// 		return s
+// 	}
 
-	if _, ok := s.GetValue().(args.Arg); ok {
-	}
-	return NewStatus(StatusSuccess, nil)
-}
+// 	if _, ok := s.GetValue().(args.Arg); ok {
+// 	}
+// 	return NewStatus(StatusSuccess, nil)
+// }
 
-func (a *Agent) parseUserInput(input string) Status {
-	var s Status
-
-	arg, err := args.ParseInputWithParser(input, a.GetParser())
+func (ag *Agent) ParseUserInput(input string) (s Status) {
+	arg, err := args.ParseInputWithParser(input, ag.GetParser())
 	if err != nil {
 		s = NewStatus(StatusFail, input)
-		s.StackError(err)
+		s.StackError(errors.New(errors.ErrInvalidUserInput))
+		return s
+	}
+	return NewStatus(StatusSuccess, arg)
+}
+
+func (ag *Agent) LookupActionInRepos(goal string, repos []metadata.Repository) Status {
+	if goal == "" || repos == nil {
+		s := NewStatus(StatusFail, []interface{}{goal, repos})
+		s.StackError(errors.New(errors.ErrInvalidGoal))
 		return s
 	}
 
-	s = NewStatus(StatusSuccess, arg)
-	return s
+	a := ag.pickFirstActionInReposMatchingGoal(goal, repos)
+	return NewStatus(StatusSuccess, a)
+}
+
+func (ag *Agent) pickFirstActionInReposMatchingGoal(g string, repos []metadata.Repository) (a action.LoganAction) {
+	var meta metadata.Entry
+	for _, r := range repos {
+		m, found := r.FindByGoal(g)
+		if found {
+			meta = m
+			break
+		}
+	}
+	return ag.actionMaker.MakeActionFromMetadata(meta)
 }
