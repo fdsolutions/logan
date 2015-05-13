@@ -3,6 +3,7 @@ package action
 import (
 	"github.com/fdsolutions/logan/errors"
 	"github.com/fdsolutions/logan/metadata"
+	exec "os/exec"
 )
 
 const (
@@ -13,6 +14,7 @@ const (
 type LoganAction interface {
 	GetMetadata() metadata.Entry
 	SetMetadata(meta metadata.Entry)
+	BuildCommand() *exec.Cmd
 }
 
 // actionImpl is a concrete action
@@ -25,11 +27,15 @@ func NewAction() *actionImpl {
 }
 
 // GetMetadata is the getter for meta attribute of the action
-func (c *actionImpl) GetMetadata() metadata.Entry {
-	return c.meta
+func (a *actionImpl) GetMetadata() metadata.Entry {
+	return a.meta
 }
 
 // SetMetadata is the getter for meta attribute of the action
-func (c *actionImpl) SetMetadata(meta metadata.Entry) {
-	c.meta = meta
+func (a *actionImpl) SetMetadata(meta metadata.Entry) {
+	a.meta = meta
+}
+
+func (a *actionImpl) BuildCommand() *exec.Cmd {
+	return new(exec.Cmd)
 }

@@ -55,8 +55,13 @@ var _ = Describe("Agent", func() {
 				Expect(s.GetErrorStackCodes()).To(ContainElement(errors.ErrInvalidGoal))
 			})
 		})
-		Context("With a gaol not referenced in any provided repos", func() {
+		Context("With a gaol that has no action referenced in any provided repos", func() {
 			XIt("Should return an ErrActionNotFound error.", func() {
+
+			})
+		})
+		Context("With a gaol that has a linked action in one of the provided repos", func() {
+			XIt("Should the action related to that given goal.", func() {
 
 			})
 		})
