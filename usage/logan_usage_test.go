@@ -10,12 +10,12 @@ import (
 var expectedUsage = `A Command line tool helps to organise our scripts.
 
 Usage:
-	logan [options] <name> [<param>...]
+	logan [options] NAME  [PARAM...]
 	logan -h | --help
 	logan --version
 
 Arguments
-	<name>  The name of the command expressed as a composition of this 3 items '<intent>:<target>:<context>'
+	NAME:   The name of the command expressed as a composition of this 3 items '<intent>:<target>:<context>'
 	    	- <intent>  : Define the action we want to perform as a verb.
 	    	              Eg: 'create'
 	    	- <target>  : Define the target that we have the intention to
@@ -25,7 +25,7 @@ Arguments
 	    	              Eg: 'windows'
 	    		Eg: create:file:windows
 
-	<param> Additional parameters we want to pass wth the command.
+	PARAM:  Additional parameters we want to pass wth the command.
 	        You can add multiple parameters with space separated.
 	        By convention, we use UPPERCASE_VAR_NAME='<var_value' ...
 	        	Eg: FILE_NAME='sample.txt' OWNER='fdsolutions'

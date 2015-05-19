@@ -22,15 +22,15 @@ type repositoryImpl struct {
 }
 
 // NewFromStore returns a new repository and set its store at the same time.
-func NewRepositoryFromStore(s Store) *repositoryImpl {
+func NewRepositoryFromStore(s Store) Repository {
 	repo := NewRepository()
 	repo.SetStore(s)
 	return repo
 }
 
 // NewRepository returns a repository instance
-func NewRepository() *repositoryImpl {
-	return &repositoryImpl{}
+func NewRepository() Repository {
+	return Repository(&repositoryImpl{})
 }
 
 // SetStore set a the repository store

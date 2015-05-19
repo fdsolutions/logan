@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	//"github.com/fdsolutions/logan/helper"
+	"github.com/fdsolutions/logan/fixtures"
 	. "github.com/fdsolutions/logan/metadata"
 )
 
@@ -17,8 +17,8 @@ var _ = Describe("MetadataRepository", func() {
 	)
 
 	BeforeEach(func() {
-		s, _ = NewFileStore(ExistingPath)
-		emptyStore, _ = NewFileStore(EmptyFilePath)
+		s, _ = NewFileStore(fixtures.ExistingPath)
+		emptyStore, _ = NewFileStore(fixtures.EmptyFilePath)
 		r = NewRepositoryFromStore(s)
 	})
 

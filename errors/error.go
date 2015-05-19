@@ -10,6 +10,9 @@ const (
 	ErrInvalidGoal      ErrorCode = "Agent: Invalid goal."
 	ErrActionNotFound   ErrorCode = "Agent: No action found for the given goal."
 
+	// Factory
+	ErrInvalidMetadataEntry ErrorCode = "ActionFactory : Invalid metadata entry - nil value param is not allowed."
+
 	// Arg parsing
 	ErrInvalidInput  ErrorCode = "Args: Invalid input."
 	ErrInvalidParams ErrorCode = "Args: Invalid params. No params retreived from user input."

@@ -64,24 +64,39 @@ func (ag *Agent) ParseUserInput(input string) (s Status) {
 }
 
 func (ag *Agent) LookupActionInRepos(goal string, repos []metadata.Repository) Status {
+	var s Status
 	if goal == "" || repos == nil {
-		s := NewStatus(StatusFail, []interface{}{goal, repos})
+		s = NewStatus(StatusFail, []interface{}{goal, repos})
 		s.StackError(errors.New(errors.ErrInvalidGoal))
 		return s
 	}
 
 	a := ag.pickFirstActionInReposMatchingGoal(goal, repos)
+	if a == nil {
+		s = NewStatus(StatusFail, []interface{}{goal, repos})
+		s.StackError(errors.New(errors.ErrActionNotFound))
+		return s
+	}
+
 	return NewStatus(StatusSuccess, a)
 }
 
+// TODO : Change the way I look for the metadata
 func (ag *Agent) pickFirstActionInReposMatchingGoal(g string, repos []metadata.Repository) (a action.LoganAction) {
-	var meta metadata.Entry
+	var (
+		meta  metadata.Entry
+		found bool
+	)
+
 	for _, r := range repos {
-		m, found := r.FindByGoal(g)
-		if found {
+		if m, found := r.FindByGoal(g); found {
 			meta = m
 			break
 		}
+	}
+
+	if !found {
+		return
 	}
 	return ag.actionMaker.MakeActionFromMetadata(meta)
 }

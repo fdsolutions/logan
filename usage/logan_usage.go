@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	CommandArgName       string = "<name>"
-	CommandArgParamsName string = "<param>"
+	CommandArgName       string = "NAME"
+	CommandArgParamsName string = "PARAM"
 )
 
 type usageInfo struct {

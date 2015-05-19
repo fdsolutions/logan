@@ -9,7 +9,8 @@ import (
 
 	. "github.com/fdsolutions/logan/agent"
 	"github.com/fdsolutions/logan/errors"
-	//"github.com/fdsolutions/logan/helper"
+	"github.com/fdsolutions/logan/fixtures"
+	"github.com/fdsolutions/logan/metadata"
 )
 
 var _ = Describe("Agent", func() {
@@ -20,8 +21,11 @@ var _ = Describe("Agent", func() {
 		WithActionAndParams
 	)
 
+	const UnkownActionGoal = "fail:test"
+
 	var (
-		agent *Agent
+		agent      *Agent
+		repoSample metadata.Repository
 
 		usersInputExamples = map[int]string{
 			WithNothing:         "",
@@ -32,6 +36,8 @@ var _ = Describe("Agent", func() {
 
 	BeforeEach(func() {
 		agent = FromFactoryAndRepos(nil, nil)
+		store, _ := metadata.NewFileStore(fixtures.ExistingPath)
+		repoSample = metadata.NewRepositoryFromStore(store)
 	})
 
 	Describe(".ParseUserInput", func() {
@@ -48,6 +54,7 @@ var _ = Describe("Agent", func() {
 			})
 		})
 	})
+
 	Describe(".LookupActionInRepos", func() {
 		Context("With empty goal and no repos provided", func() {
 			It("Should fail with an ErrInvalidGoal error.", func() {
@@ -55,13 +62,15 @@ var _ = Describe("Agent", func() {
 				Expect(s.GetErrorStackCodes()).To(ContainElement(errors.ErrInvalidGoal))
 			})
 		})
-		Context("With a gaol that has no action referenced in any provided repos", func() {
-			XIt("Should return an ErrActionNotFound error.", func() {
-
+		Context("With a goal that has no action related in any provided repos", func() {
+			It("Should return an ErrActionNotFound error.", func() {
+				s := agent.LookupActionInRepos(UnkownActionGoal, []metadata.Repository{repoSample})
+				Expect(s.GetCode()).To(Equal(StatusFail))
+				Expect(s.GetErrorStackCodes()).To(ContainElement(errors.ErrActionNotFound))
 			})
 		})
-		Context("With a gaol that has a linked action in one of the provided repos", func() {
-			XIt("Should the action related to that given goal.", func() {
+		Context("With a goal that hthe related action is present in one of the provided repos", func() {
+			XIt("Should return the action related to that given goal.", func() {
 
 			})
 		})
