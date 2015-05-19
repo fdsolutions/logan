@@ -1,2 +1,5 @@
 .idea
 _vendor
+.DS_Store
+**/**/.DS_Store
+
