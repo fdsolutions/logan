@@ -19,7 +19,7 @@ type LoganAction interface {
 
 // actionImpl is a concrete action
 type actionImpl struct {
-	meta metadata.Entry
+	meta *metadata.Entry
 }
 
 func NewAction() *actionImpl {
@@ -28,12 +28,12 @@ func NewAction() *actionImpl {
 
 // GetMetadata is the getter for meta attribute of the action
 func (a *actionImpl) GetMetadata() metadata.Entry {
-	return a.meta
+	return *a.meta
 }
 
 // SetMetadata is the getter for meta attribute of the action
 func (a *actionImpl) SetMetadata(meta metadata.Entry) {
-	a.meta = meta
+	a.meta = meta.Clone()
 }
 
 func (a *actionImpl) BuildCommand() *exec.Cmd {

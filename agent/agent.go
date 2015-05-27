@@ -4,6 +4,7 @@ import (
 	"github.com/fdsolutions/logan/action"
 	"github.com/fdsolutions/logan/args"
 	"github.com/fdsolutions/logan/errors"
+	//"github.com/fdsolutions/logan/helper"
 	"github.com/fdsolutions/logan/metadata"
 )
 
@@ -18,11 +19,24 @@ type API interface {
 
 // Agent is a logan agent
 type Agent struct {
-	actionMaker action.Factory
-	metaRepos   []metadata.Repository
-	statusStack []Status
-	parser      args.ParamParser
+	actionMaker   action.Factory
+	statusStack   []Status
+	parser        args.ParamParser
+	metadataRepos []metadata.Repository
+
 	API
+}
+
+// FromFactoryAndRepos returns a instnace of a agent with a given factory  and repositories.
+func FromFactoryAndRepos(factory action.Factory, repos []metadata.Repository) (ag *Agent, err errors.LoganError) {
+	if factory == nil {
+		err = errors.New(errors.ErrMissingActionFactory)
+		return
+	}
+	ag = &Agent{}
+	ag.actionMaker = factory
+	ag.metadataRepos = repos
+	return
 }
 
 // GetParser returns the agent's param parser
@@ -30,12 +44,9 @@ func (ag *Agent) GetParser() args.ParamParser {
 	return ag.parser
 }
 
-// FromFactoryAndRepos returns a instnace of a agent with a given factory  and repositories.
-func FromFactoryAndRepos(factory action.Factory, repos []metadata.Repository) *Agent {
-	ag := &Agent{}
-	ag.actionMaker = factory
-	ag.metaRepos = repos
-	return ag
+// GetMetadataRepos returns the list of repos register on the agent
+func (ag *Agent) GetMetadataRepos() []metadata.Repository {
+	return ag.metadataRepos
 }
 
 // PerformActionFromInput processes user input and perform the action related ot the input.
@@ -64,15 +75,22 @@ func (ag *Agent) ParseUserInput(input string) (s Status) {
 }
 
 func (ag *Agent) LookupActionInRepos(goal string, repos []metadata.Repository) Status {
-	var s Status
+	var (
+		s Status
+		a action.LoganAction
+	)
+
 	if goal == "" || repos == nil {
 		s = NewStatus(StatusFail, []interface{}{goal, repos})
 		s.StackError(errors.New(errors.ErrInvalidGoal))
 		return s
 	}
 
-	a := ag.pickFirstActionInReposMatchingGoal(goal, repos)
-	if a == nil {
+	a, err := ag.pickFirstActionInReposMatchingGoal(goal, repos)
+
+	if err != nil {
+
+		//helper.W("maker", a)
 		s = NewStatus(StatusFail, []interface{}{goal, repos})
 		s.StackError(errors.New(errors.ErrActionNotFound))
 		return s
@@ -82,21 +100,29 @@ func (ag *Agent) LookupActionInRepos(goal string, repos []metadata.Repository) S
 }
 
 // TODO : Change the way I look for the metadata
-func (ag *Agent) pickFirstActionInReposMatchingGoal(g string, repos []metadata.Repository) (a action.LoganAction) {
+func (ag *Agent) pickFirstActionInReposMatchingGoal(g string, repos []metadata.Repository) (a action.LoganAction, err errors.LoganError) {
 	var (
 		meta  metadata.Entry
 		found bool
 	)
 
+	// If there a action factory present on the agent
+	if ag.actionMaker == nil {
+		err = errors.New(errors.ErrMissingActionFactory)
+		return
+	}
+
 	for _, r := range repos {
-		if m, found := r.FindByGoal(g); found {
-			meta = m
+		if meta, found = r.FindByGoal(g); found {
 			break
 		}
 	}
 
 	if !found {
+		err = errors.New(errors.ErrNoMetadataFound)
 		return
 	}
-	return ag.actionMaker.MakeActionFromMetadata(meta)
+
+	a = ag.actionMaker.MakeActionFromMetadata(meta)
+	return
 }

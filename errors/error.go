@@ -6,12 +6,16 @@ import (
 
 const (
 	// Agent
-	ErrInvalidUserInput ErrorCode = "Agent: Invalid user inputs."
-	ErrInvalidGoal      ErrorCode = "Agent: Invalid goal."
-	ErrActionNotFound   ErrorCode = "Agent: No action found for the given goal."
+	ErrInvalidUserInput     ErrorCode = "Agent: Invalid user inputs."
+	ErrInvalidGoal          ErrorCode = "Agent: Invalid goal."
+	ErrActionNotFound       ErrorCode = "Agent: No action found for the given goal."
+	ErrMissingActionFactory ErrorCode = "Agent: An action factory is required to get an instance of an action"
 
 	// Factory
 	ErrInvalidMetadataEntry ErrorCode = "ActionFactory : Invalid metadata entry - nil value param is not allowed."
+
+	// Repository
+	ErrNoMetadataFound ErrorCode = "MetatdataRepository : No metadata found!"
 
 	// Arg parsing
 	ErrInvalidInput  ErrorCode = "Args: Invalid input."
