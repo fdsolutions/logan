@@ -6,46 +6,10 @@ import (
 
 	. "github.com/fdsolutions/logan/args"
 	"github.com/fdsolutions/logan/errors"
+	"github.com/fdsolutions/logan/fixtures"
 )
 
-var (
-	defaultFlags = map[string]bool{"--help": false, "--version": false, "--sudo": false}
-
-	paramParser ParamParser
-
-	userInputExamples = []struct {
-		in       string
-		expected Arg
-	}{
-		{"--sudo start:server",
-			Arg{"start:server",
-				map[string]bool{"--help": false, "--version": false, "--sudo": true},
-				nil}},
-		{"start:server --sudo ", // Test overlaping
-			Arg{"start:server",
-				map[string]bool{"--help": false, "--version": false, "--sudo": true},
-				nil}},
-		{"show:help",
-			Arg{"show:help",
-				defaultFlags,
-				nil}},
-		{"install:pkg:ubuntu PKG_NAME='apache'",
-			Arg{"install:pkg:ubuntu",
-				defaultFlags,
-				map[string]string{"PKG_NAME": "apache"}}},
-		{"connect:database:mysql DATABASE_NAME='mysqldb'",
-			Arg{"connect:database:mysql",
-				defaultFlags,
-				map[string]string{"DATABASE_NAME": "mysqldb"}}},
-		{"--sudo connect:database:mysql DATABASE_NAME='mysqldb' USER='root' PASSWORD='root' VERSION=1.0.1",
-			Arg{"connect:database:mysql",
-				map[string]bool{"--help": false, "--version": false, "--sudo": true},
-				map[string]string{"DATABASE_NAME": "mysqldb",
-					"USER":     "root",
-					"PASSWORD": "root",
-					"VERSION":  "1.0.1"}}},
-	}
-)
+var paramParser ParamParser
 
 var _ = Describe("args", func() {
 
@@ -65,9 +29,9 @@ var _ = Describe("args", func() {
 
 	Context("With no given param parser", func() {
 		It("Should parse user input using the default parser", func() {
-			for _, input := range userInputExamples {
-				var got, _ = ParseInputWithParser(input.in, nil)
-				var expected = input.expected
+			for _, input := range fixtures.UserInputExamples {
+				var got, _ = ParseInputWithParser(input.In, nil)
+				var expected = input.Expected
 				Expect(got).To(Equal(expected))
 			}
 		})
@@ -76,9 +40,9 @@ var _ = Describe("args", func() {
 	Context("With given param parser", func() {
 		It("should parse user inputs", func() {
 			paramParser = NewParamParser()
-			for _, input := range userInputExamples {
-				var got, _ = ParseInputWithParser(input.in, paramParser)
-				var expected = input.expected
+			for _, input := range fixtures.UserInputExamples {
+				var got, _ = ParseInputWithParser(input.In, paramParser)
+				var expected = input.Expected
 				Expect(got).To(Equal(expected))
 			}
 		})
