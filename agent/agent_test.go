@@ -110,22 +110,22 @@ var _ = Describe("Agent", func() {
 		Context("With a goal that the related action is present in one of the provided repos", func() {
 			It("Should return the action related to that given goal.", func() {
 				s := ag.LookupActionInRepos(fixtures.ExistingGoal, []metadata.Repository{repoSample})
-				//expected := factory.MakeActionFromMetadata(metadata.Entry{
-				//	"copy:file:unix", // goal
-				//	"copy",           // intent
-				//	"file",           // target
-				//	"unix",           // context
-				//	"/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>",  // path
-				//	[]string{"<SOURCE_FILE>", "<DESTINATION_FILE>"}, // required_params
-				//})
+				expected := defaultFactory.MakeActionFromMetadata(metadata.Entry{
+					"copy:file:unix", // goal
+					"copy",           // intent
+					"file",           // target
+					"unix",           // context
+					"/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>",  // path
+					[]string{"<SOURCE_FILE>", "<DESTINATION_FILE>"}, // required_params
+				})
 
 				Expect(s.GetCode()).NotTo(Equal(StatusFail))
 
-				//if a, ok := s.GetValue().(action.LoganAction); ok {
-				//	Expect(a).To(Equal(expected))
-				//} else {
-				//	Fail("Wrong action value returned")
-				//}
+				if a, ok := s.GetValue().(action.LoganAction); ok {
+					Expect(a).To(BeEquivalentTo(expected))
+				} else {
+					Fail("Wrong action value returned")
+				}
 			})
 		})
 	})
