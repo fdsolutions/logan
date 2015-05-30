@@ -5,10 +5,10 @@ import (
 
 	docopt "github.com/docopt/docopt-go"
 
-	errors "github.com/fdsolutions/logan/errors"
-	helper "github.com/fdsolutions/logan/helper"
-	usage "github.com/fdsolutions/logan/usage"
-	version "github.com/fdsolutions/logan/version"
+	"github.com/fdsolutions/logan/errors"
+	"github.com/fdsolutions/logan/helper"
+	"github.com/fdsolutions/logan/usage"
+	"github.com/fdsolutions/logan/version"
 )
 
 const (
@@ -72,7 +72,7 @@ func parseArgElementsWithParser(args map[string]interface{}, pp ParamParser) Arg
 }
 
 func parseName(args map[string]interface{}) string {
-	name, _ := args[usage.CommandArgName]
+	name, _ := args[usage.ActionTokenName]
 	return name.(string)
 }
 
@@ -86,8 +86,9 @@ func parseFlags(args map[string]interface{}) (flags map[string]bool) {
 
 // parseParamsWithParser  parses arguments and retrives argument's parameters as a key/value pairs
 func parseParamsWithParser(args map[string]interface{}, pp ParamParser) (map[string]string, errors.LoganError) {
-	argsParamList, _ := args[usage.CommandArgParamsName].([]string)
+	argsParamList, _ := args[usage.ActionParamsTokenName].([]string)
 	params, ok := parseParamListWithParser(argsParamList, pp)
+
 	if !ok {
 		return nil, errors.New(errors.ErrInvalidParams)
 	}
@@ -100,6 +101,7 @@ func parseParamListWithParser(paramList []string, pp ParamParser) ([][]string, b
 	}
 	inlineParamList := strings.Join(paramList, " ")
 	parsedParams := pp.Parse(inlineParamList)
+
 	if parsedParams == nil {
 		return nil, false
 	}
