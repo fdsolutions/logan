@@ -11,9 +11,9 @@ import (
 type API interface {
 	ParseUserInput(input string) Status
 	LookupActionInRepos(goal string, repos []metadata.Repository) Status
-	//PerformActionFromInput(input string) Status
+	PerformAction(action.LoganAction) Status
 	// RegisterRepo(r metadata.Repository) Status
-	// Perform(action.LoganAction) Status
+	//PerformActionFromInput(input string) Status
 	// PrintOutput(output, printer io.Writer) Status
 }
 
@@ -23,6 +23,7 @@ type Agent struct {
 	statusStack   []Status
 	parser        args.ParamParser
 	metadataRepos []metadata.Repository
+	Output        string
 
 	API
 }
@@ -49,21 +50,13 @@ func (ag *Agent) GetMetadataRepos() []metadata.Repository {
 	return ag.metadataRepos
 }
 
-// PerformActionFromInput processes user input and perform the action related ot the input.
-// It follows a the template method pattern with a clear workflow
-// You can change the behavior by overriding function from the agent API
-// func (a *Agent) PerformActionFromInput(input string) Status {
-// 	s := a.ParseUserInput(input)
+// PerformAction execute the command related to the given action
+func (a *Agent) PerformAction(act action.LoganAction) Status {
 
-// 	if s.GetCode() == StatusFail {
-// 		return s
-// 	}
+	return NewStatus(StatusSuccess, nil)
+}
 
-// 	if _, ok := s.GetValue().(args.Arg); ok {
-// 	}
-// 	return NewStatus(StatusSuccess, nil)
-// }
-
+// ParseUserInput parse the user input and return the related argument's values
 func (ag *Agent) ParseUserInput(input string) (s Status) {
 	arg, err := args.ParseInputWithParser(input, ag.GetParser())
 	if err != nil {

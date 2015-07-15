@@ -129,4 +129,38 @@ var _ = Describe("Agent", func() {
 			})
 		})
 	})
+
+	Describe(".PerformAction", func() {
+		Context("with an invalid action (no action)", func() {
+			It("Should do nothing", func() {
+				_ = ag.PerformAction(nil)
+				Expect(ag.Output).To(BeEmpty())
+			})
+		})
+		Context("with a given action", func() {
+			// Context("When the execution of the command linked to that action failed", func() {
+			// 	It("Should fail with error ErrActionPerfomingFailed and report failure (output).", func() {
+
+			// 	})
+			// })
+			// Context("When the execution of the command linked to that action failed", func() {
+			// 	XIt("Should succeed and keep the related output.", func() {
+
+			// 	})
+			// })
+
+			It("Should execute the command linked to that action and keep the result", func() {
+				act := defaultFactory.MakeActionFromMetadata(metadata.Entry{
+					"copy:file:unix", // goal
+					"copy",           // intent
+					"file",           // target
+					"unix",           // context
+					"/usr/bin/cp <SOURCE_FILE> <DESTINATION_FILE>",  // path
+					[]string{"<SOURCE_FILE>", "<DESTINATION_FILE>"}, // required_params
+				})
+				_ = ag.PerformAction(act)
+
+			})
+		})
+	})
 })

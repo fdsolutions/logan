@@ -1,9 +1,10 @@
 package action
 
 import (
+	"os/exec"
+
 	"github.com/fdsolutions/logan/errors"
 	"github.com/fdsolutions/logan/metadata"
-	exec "os/exec"
 )
 
 const (

@@ -1,0 +1,5 @@
+{
+	"ImportPath": "github.com/fdsolutions/logan",
+	"GoVersion": "go1.4.2",
+	"Deps": []
+}
