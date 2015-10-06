@@ -3,12 +3,13 @@ package usage
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
 )
 
 const (
-	CommandArgName       string = "<name>"
-	CommandArgParamsName string = "<param>"
+	ActionTokenName       string = "<action>"
+	ActionParamsTokenName string = "<param>"
 )
 
 type usageInfo struct {
@@ -20,11 +21,11 @@ func LoganUsage() string {
 	b := new(bytes.Buffer)
 
 	info := usageInfo{
-		CommandArgName,
-		CommandArgParamsName,
+		ActionTokenName,
+		ActionParamsTokenName,
 	}
 
-	t := template.Must(template.New("logan usage").Parse(loganUsageTpl))
+	t := template.Must(template.New("logan usage").Parse(strings.TrimSpace(loganUsageTpl)))
 	err := t.Execute(b, info)
 	if err != nil {
 		panic(fmt.Sprintf("Fail to compile the logan usage template: %v", err))

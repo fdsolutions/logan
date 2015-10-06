@@ -15,7 +15,7 @@ type Predicate func(ent Entry) bool
 // Store defines abstract operations to implement for a metadata store
 type Store interface {
 	Filepath() string
-	QueryAll() ([]Entry, error)
+	QueryAll() ([]Entry, errors.LoganError)
 	Query(cond Predicate) []Entry
 }
 
@@ -26,7 +26,7 @@ type FileStore struct {
 }
 
 // NewFileStore returns an instance of a FileStore
-func NewFileStore(path string) (fs *FileStore, err error) {
+func NewFileStore(path string) (fs *FileStore, err errors.LoganError) {
 	if path == "" || helper.FileDoesntExist(path) {
 		err = errors.New(ErrInvalidFilePath)
 		return
@@ -71,7 +71,7 @@ func (fs *FileStore) Query(cond Predicate) []Entry {
 // QueryAll returns all metadata contains in the store
 // It returns an error as a second return value if something bad happens,
 // this to enable error handling
-func (fs *FileStore) QueryAll() (entries []Entry, err error) {
+func (fs *FileStore) QueryAll() (entries []Entry, err errors.LoganError) {
 	if fs.HasDataAlreadyLoaded() {
 		return fs.data, nil
 	}
@@ -84,20 +84,20 @@ func (fs *FileStore) HasDataAlreadyLoaded() bool {
 	return (fs.data != nil && len(fs.data) > 1)
 }
 
-func (fs *FileStore) load() (err error) {
+func (fs *FileStore) load() (err errors.LoganError) {
 	jsonContentAsBytes, _ := ioutil.ReadFile(fs.Filepath())
 	err = fs.loadFromJSON(jsonContentAsBytes)
 	return
 }
 
-func (fs *FileStore) loadFromJSON(content []byte) (err error) {
+func (fs *FileStore) loadFromJSON(content []byte) errors.LoganError {
 	var entries []*Entry
-	err = json.Unmarshal(content, &entries)
+	err := json.Unmarshal(content, &entries)
 	if err != nil {
 		return errors.New(ErrUnsupportedFileFormat)
 	}
 	fs.setDataAndAutoFillEachEntry(entries)
-	return
+	return nil
 }
 
 func (fs *FileStore) setDataAndAutoFillEachEntry(entries []*Entry) {

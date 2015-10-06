@@ -1,4 +1,4 @@
-package args_test
+package action_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestArgs(t *testing.T) {
+func TestAction(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Args Suite")
+	RunSpecs(t, "Action Suite")
 }

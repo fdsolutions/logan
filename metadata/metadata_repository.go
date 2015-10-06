@@ -7,9 +7,10 @@ import (
 )
 
 // Repository is a set of methods that a metadata repository must implement
+// TODO: Add 'error' has a second value returned by the interface functions
 type Repository interface {
 	FindAll() []Entry
-	FindByGoal(string) Entry
+	FindByGoal(string) (Entry, bool)
 	FindByContext(string) []Entry
 	SetStore(Store)
 }
@@ -21,15 +22,15 @@ type repositoryImpl struct {
 }
 
 // NewFromStore returns a new repository and set its store at the same time.
-func NewRepositoryFromStore(s Store) *repositoryImpl {
+func NewRepositoryFromStore(s Store) Repository {
 	repo := NewRepository()
 	repo.SetStore(s)
 	return repo
 }
 
 // NewRepository returns a repository instance
-func NewRepository() *repositoryImpl {
-	return &repositoryImpl{}
+func NewRepository() Repository {
+	return Repository(&repositoryImpl{})
 }
 
 // SetStore set a the repository store
@@ -51,13 +52,13 @@ func (r *repositoryImpl) FindAll() (entries []Entry) {
 // FindByGoal get the first entry of the given goal even if the store
 // retrieve more than one entries for that goal.
 // TODO: Find a way to Handle conflicts when multiple entries are retrived
-func (r *repositoryImpl) FindByGoal(g string) (entry Entry) {
+func (r *repositoryImpl) FindByGoal(g string) (entry Entry, found bool) {
 	entries := r.getStore().Query(PredicateForGoal(g))
 	if len(entries) < 1 {
+		found = false
 		return
 	}
-	entry = entries[0]
-	return
+	return entries[0], true
 }
 
 // FindByContext returns all metadata entries related to a given context

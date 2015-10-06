@@ -1,20 +1,12 @@
 package metadata_test
 
 import (
-	"path/filepath"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/fdsolutions/logan/errors"
+	"github.com/fdsolutions/logan/fixtures"
 	. "github.com/fdsolutions/logan/metadata"
-)
-
-var (
-	UnexistingPath      string = filepath.Join("..", "fixtures", "nofile.metas")
-	ExistingPath        string = filepath.Join("..", "fixtures", "command_examples.metas")
-	EmptyFilePath       string = filepath.Join("..", "fixtures", "empty.metas")
-	UnsupportedFilePath string = filepath.Join("..", "fixtures", "unsupported_yaml.metas")
 )
 
 var _ = Describe("MetadataStore", func() {
@@ -24,8 +16,8 @@ var _ = Describe("MetadataStore", func() {
 	)
 
 	BeforeEach(func() {
-		store, _ = NewFileStore(ExistingPath)
-		emptyStore, _ = NewFileStore(EmptyFilePath)
+		store, _ = NewFileStore(fixtures.ExistingPath)
+		emptyStore, _ = NewFileStore(fixtures.EmptyFilePath)
 	})
 
 	Describe(".NewFileStore", func() {
@@ -38,15 +30,14 @@ var _ = Describe("MetadataStore", func() {
 
 		Context("Given an unexisting filepath", func() {
 			It("should return an ErrFileDontExistAtPath", func() {
-				_, err := NewFileStore(UnexistingPath)
+				_, err := NewFileStore(fixtures.UnexistingPath)
 				Expect(err).To(MatchError(errors.New(ErrInvalidFilePath)))
 			})
 		})
 
 		Context("Given an existing filepath", func() {
 			It("should get back an intance of the store", func() {
-				store, _ = NewFileStore(ExistingPath)
-				Expect(store.Filepath()).To(Equal(ExistingPath))
+				Expect(store.Filepath()).To(Equal(fixtures.ExistingPath))
 			})
 		})
 	})
@@ -62,7 +53,7 @@ var _ = Describe("MetadataStore", func() {
 
 			Context("With a source file containing metadata in a non-JOSN format", func() {
 				It("should return an ErrUnsupportedFileFormat", func() {
-					store, _ := NewFileStore(UnsupportedFilePath)
+					store, _ := NewFileStore(fixtures.UnsupportedFilePath)
 					_, err := store.QueryAll()
 					Expect(err).To(MatchError(errors.New(ErrUnsupportedFileFormat)))
 				})

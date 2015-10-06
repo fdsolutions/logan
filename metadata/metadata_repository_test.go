@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	//"github.com/fdsolutions/logan/helper"
+	"github.com/fdsolutions/logan/fixtures"
 	. "github.com/fdsolutions/logan/metadata"
 )
 
@@ -17,8 +17,8 @@ var _ = Describe("MetadataRepository", func() {
 	)
 
 	BeforeEach(func() {
-		s, _ = NewFileStore(ExistingPath)
-		emptyStore, _ = NewFileStore(EmptyFilePath)
+		s, _ = NewFileStore(fixtures.ExistingPath)
+		emptyStore, _ = NewFileStore(fixtures.EmptyFilePath)
 		r = NewRepositoryFromStore(s)
 	})
 
@@ -36,14 +36,14 @@ var _ = Describe("MetadataRepository", func() {
 	})
 
 	Describe("#FindByGoal", func() {
-		It("Should no metatdata entry for the given goal from an empty store", func() {
+		It("Should return no metatdata entry for the given goal from an empty store", func() {
 			r.SetStore(emptyStore)
-			entry := r.FindByGoal(TestGoal)
+			entry, _ := r.FindByGoal(TestGoal)
 			Expect(entry).To(BeZero())
 		})
 
-		It("Should the metatdata entry of the given goal.", func() {
-			entry := r.FindByGoal(TestGoal)
+		It("Should return the metatdata entry of the given goal.", func() {
+			entry, _ := r.FindByGoal(TestGoal)
 			expected := FromGoal(TestGoal)
 			Expect(entry).To(Equal(*expected))
 		})

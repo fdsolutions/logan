@@ -5,17 +5,14 @@ import (
 
 	docopt "github.com/docopt/docopt-go"
 
-	errors "github.com/fdsolutions/logan/errors"
-	helper "github.com/fdsolutions/logan/helper"
-	usage "github.com/fdsolutions/logan/usage"
-	version "github.com/fdsolutions/logan/version"
+	"github.com/fdsolutions/logan/errors"
+	"github.com/fdsolutions/logan/helper"
+	"github.com/fdsolutions/logan/usage"
+	"github.com/fdsolutions/logan/version"
 )
 
 const (
 	argsParamsRegexPattern = `(?:(\w*)='?([^']*)'?)*`
-
-	ErrInvalidInput  errors.ErrorCode = "Invalid input."
-	ErrInvalidParams errors.ErrorCode = "Invalid params : No params retreived from user input."
 )
 
 var (
@@ -24,6 +21,8 @@ var (
 		"VERSION": "--version",
 		"SUDO":    "--sudo",
 	}
+
+	defaultParamParser = NewParamParser()
 )
 
 // Arg holds CLI argument elements
@@ -34,16 +33,34 @@ type Arg struct {
 }
 
 // ArgFromInput returns argument elements from user command input
-func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e error) {
-	argv := strings.Split(input, " ")
+func ParseInputWithParser(input string, pp ParamParser) (arg Arg, e errors.LoganError) {
+	if pp == nil {
+		pp = GetDefaultParamParser()
+	}
 
-	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false)
-	if err != nil {
-		e = errors.New(ErrInvalidInput)
+	argv := getArgvFromInput(input)
+	parsedArgs, err := docopt.Parse(usage.LoganUsage(), argv, true, version.LoganVersion, false, false)
+	if err != nil || parsedArgs == nil {
+		e = errors.New(errors.ErrInvalidInput)
 		return
 	}
+
 	arg = parseArgElementsWithParser(parsedArgs, pp)
 	return
+}
+
+func getArgvFromInput(input string) (argv []string) {
+	// Sanitize the given  input
+	in := strings.TrimSpace(input)
+	if in == "" {
+		return
+	}
+	return strings.Split(in, " ")
+}
+
+// GetDefaultParamParser returns the default param parser for args
+func GetDefaultParamParser() ParamParser {
+	return defaultParamParser
 }
 
 func parseArgElementsWithParser(args map[string]interface{}, pp ParamParser) Arg {
@@ -55,7 +72,7 @@ func parseArgElementsWithParser(args map[string]interface{}, pp ParamParser) Arg
 }
 
 func parseName(args map[string]interface{}) string {
-	name, _ := args[usage.CommandArgName]
+	name, _ := args[usage.ActionTokenName]
 	return name.(string)
 }
 
@@ -68,11 +85,12 @@ func parseFlags(args map[string]interface{}) (flags map[string]bool) {
 }
 
 // parseParamsWithParser  parses arguments and retrives argument's parameters as a key/value pairs
-func parseParamsWithParser(args map[string]interface{}, pp ParamParser) (map[string]string, error) {
-	argsParamList, _ := args[usage.CommandArgParamsName].([]string)
+func parseParamsWithParser(args map[string]interface{}, pp ParamParser) (map[string]string, errors.LoganError) {
+	argsParamList, _ := args[usage.ActionParamsTokenName].([]string)
 	params, ok := parseParamListWithParser(argsParamList, pp)
+
 	if !ok {
-		return nil, errors.New(ErrInvalidParams)
+		return nil, errors.New(errors.ErrInvalidParams)
 	}
 	return helper.ArrayToMap(params), nil
 }
@@ -83,6 +101,7 @@ func parseParamListWithParser(paramList []string, pp ParamParser) ([][]string, b
 	}
 	inlineParamList := strings.Join(paramList, " ")
 	parsedParams := pp.Parse(inlineParamList)
+
 	if parsedParams == nil {
 		return nil, false
 	}

@@ -7,6 +7,7 @@ import (
 // Factory is compose of a set of methods to create actions
 type Factory interface {
 	MakeAction() LoganAction
+	MakeActionFromMetadata(meta metadata.Entry) LoganAction
 }
 
 // factoryImpl is a concrete factory

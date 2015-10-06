@@ -71,3 +71,11 @@ func (entry *Entry) SetPath(path string) {
 func (entry *Entry) SetRequiredParams(params []string) {
 	entry.RequiredParams = params
 }
+
+// Clone returns a copy of the given metadata
+func (entry *Entry) Clone() *Entry {
+	clone := FromGoal(entry.Goal)
+	clone.SetPath(entry.Path)
+	clone.SetRequiredParams(entry.RequiredParams)
+	return clone
+}
