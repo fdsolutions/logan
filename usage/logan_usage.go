@@ -8,21 +8,21 @@ import (
 )
 
 const (
-	ActionTokenName       string = "<action>"
-	ActionParamsTokenName string = "<param>"
+	ActionIntentToken string = "<intent>"
+	ActionParamToken  string = "<param>"
 )
 
 type usageInfo struct {
-	ArgName      string
-	ArgParamName string
+	Intent string
+	Param  string
 }
 
 func LoganUsage() string {
 	b := new(bytes.Buffer)
 
 	info := usageInfo{
-		ActionTokenName,
-		ActionParamsTokenName,
+		ActionIntentToken,
+		ActionParamToken,
 	}
 
 	t := template.Must(template.New("logan usage").Parse(strings.TrimSpace(loganUsageTpl)))
